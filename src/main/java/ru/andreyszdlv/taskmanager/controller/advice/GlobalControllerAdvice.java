@@ -8,6 +8,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.andreyszdlv.taskmanager.exception.InvalidTokenException;
 import ru.andreyszdlv.taskmanager.exception.UserAlreadyExsitsException;
 import ru.andreyszdlv.taskmanager.exception.UserNotFoundException;
 
@@ -20,7 +21,8 @@ public class GlobalControllerAdvice {
     private final MessageSource messageSource;
 
     @ExceptionHandler({
-            UserAlreadyExsitsException.class
+            UserAlreadyExsitsException.class,
+            InvalidTokenException.class
     })
     public ProblemDetail handleConflictException(RuntimeException ex, Locale locale) {
         return ProblemDetail.forStatusAndDetail(
