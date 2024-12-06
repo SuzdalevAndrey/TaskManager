@@ -34,7 +34,7 @@ public class CacheConfig {
         cacheConfigurations.put(refreshTokenNameCache,
                 RedisCacheConfiguration
                         .defaultCacheConfig()
-                        .entryTtl(Duration.ofHours(24)));
+                        .entryTtl(Duration.ofDays(2)));
 
         return RedisCacheManager.builder(connectionFactory)
                 .withInitialCacheConfigurations(cacheConfigurations)

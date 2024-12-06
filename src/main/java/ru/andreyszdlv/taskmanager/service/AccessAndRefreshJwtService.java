@@ -2,13 +2,13 @@ package ru.andreyszdlv.taskmanager.service;
 
 public interface AccessAndRefreshJwtService {
 
-    String generateAccessToken(long userId, String role);
+    String generateAccessToken(String userEmail, String role);
 
-    String generateRefreshToken(long userId, String role);
+    String generateRefreshToken(String userEmail, String role);
 
-    String getAccessTokenByUserId(long userId);
+    String getAccessTokenByUserEmail(String userEmail);
 
-    String getRefreshTokenByUserId(long userId);
+    String getRefreshTokenByUserEmail(String userEmail);
 
-    void deleteByUserId(long userId);
+    void deleteByUserId(String userEmail);
 }

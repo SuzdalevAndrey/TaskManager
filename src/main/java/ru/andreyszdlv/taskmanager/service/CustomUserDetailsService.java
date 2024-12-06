@@ -23,5 +23,4 @@ public class CustomUserDetailsService implements UserDetailsService {
                     () -> new UserNotFoundException("error.404.user.not_found")
                 );
     }
-
 }

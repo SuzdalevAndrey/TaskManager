@@ -14,10 +14,9 @@ import ru.andreyszdlv.taskmanager.exception.InvalidTokenException;
 import ru.andreyszdlv.taskmanager.mapper.UserMapper;
 import ru.andreyszdlv.taskmanager.model.User;
 import ru.andreyszdlv.taskmanager.repository.UserRepository;
+import ru.andreyszdlv.taskmanager.util.SecurityUtils;
 import ru.andreyszdlv.taskmanager.validator.JwtValidator;
 import ru.andreyszdlv.taskmanager.validator.UserValidator;
-
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -61,24 +60,23 @@ public class AuthService {
 
         User user = (User) authentication.getPrincipal();
 
-        String accessToken = accessAndRefreshJwtService.generateAccessToken(user.getId(), user.getRole().name());
+        String accessToken = accessAndRefreshJwtService.generateAccessToken(user.getEmail(), user.getRole().name());
 
-        String refreshToken = accessAndRefreshJwtService.generateRefreshToken(user.getId(), user.getRole().name());
+        String refreshToken = accessAndRefreshJwtService.generateRefreshToken(user.getEmail(), user.getRole().name());
 
         return new LoginResponseDto(accessToken, refreshToken);
     }
 
-    @Transactional
     public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto requestDto) {
         String refreshToken = requestDto.refreshToken();
 
         jwtValidator.validateRefresh(refreshToken);
 
-        long userId = jwtSecurityService.extractUserId(refreshToken);
+        String userEmail = jwtSecurityService.extractUserEmail(refreshToken);
 
         String role = jwtSecurityService.extractRole(refreshToken);
 
-        String accessToken = accessAndRefreshJwtService.generateAccessToken(userId, role);
+        String accessToken = accessAndRefreshJwtService.generateAccessToken(userEmail, role);
 
         return RefreshTokenResponseDto
                 .builder()
@@ -87,13 +85,10 @@ public class AuthService {
                 .build();
     }
 
+    public void logout() {
 
-    public void logout(String accessToken) {
+        String userEmail = SecurityUtils.getCurrentUserName();
 
-        jwtValidator.validateAccess(accessToken);
-
-        long userId = jwtSecurityService.extractUserId(accessToken);
-
-        accessAndRefreshJwtService.deleteByUserId(userId);
+        accessAndRefreshJwtService.deleteByUserId(userEmail);
     }
 }

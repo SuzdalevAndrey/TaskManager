@@ -15,30 +15,30 @@ public class AccessAndRefreshJwtCacheServiceImpl implements AccessAndRefreshJwtS
 
     private final JwtSecurityService jwtSecurityService;
 
-    @CachePut(value = "${spring.redis.accessTokenNameCache}", key = "#userId")
-    public String generateAccessToken(long userId, String role){
-        return jwtSecurityService.generateToken(userId, role);
+    @CachePut(value = "${spring.redis.accessTokenNameCache}", key = "#userEmail")
+    public String generateAccessToken(String userEmail, String role){
+        return jwtSecurityService.generateToken(userEmail, role);
     }
 
-    @CachePut(value = "${spring.redis.refreshTokenNameCache}", key = "#userId")
-    public String generateRefreshToken(long userId, String role){
-        return jwtSecurityService.generateRefreshToken(userId, role);
+    @CachePut(value = "${spring.redis.refreshTokenNameCache}", key = "#userEmail")
+    public String generateRefreshToken(String userEmail, String role){
+        return jwtSecurityService.generateRefreshToken(userEmail, role);
     }
 
-    @Cacheable(value = "${spring.redis.accessTokenNameCache}", key = "#userId")
-    public String getAccessTokenByUserId(long userId){
+    @Cacheable(value = "${spring.redis.accessTokenNameCache}", key = "#userEmail")
+    public String getAccessTokenByUserEmail(String userEmail){
         return null;
     }
 
-    @Cacheable(value = "${spring.redis.refreshTokenNameCache}", key = "#userId")
-    public String getRefreshTokenByUserId(long userId){
+    @Cacheable(value = "${spring.redis.refreshTokenNameCache}", key = "#userEmail")
+    public String getRefreshTokenByUserEmail(String userEmail){
         return null;
     }
 
     @Caching(evict = {
-            @CacheEvict(value = "${spring.redis.accessTokenNameCache}", key = "#userId"),
-            @CacheEvict(value = "${spring.redis.refreshTokenNameCache}", key = "#userId")
+            @CacheEvict(value = "${spring.redis.accessTokenNameCache}", key = "#userEmail"),
+            @CacheEvict(value = "${spring.redis.refreshTokenNameCache}", key = "#userEmail")
     })
-    public void deleteByUserId(long userId){}
+    public void deleteByUserId(String userEmail){}
 
 }

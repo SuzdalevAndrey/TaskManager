@@ -75,17 +75,9 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(
-            @NotBlank(message = "{validation.error.refresh_token.is_empty}") @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
-            BindingResult bindingResult) throws BindException {
+    public ResponseEntity<Void> logout(){
 
-        if (bindingResult.hasErrors()) {
-            log.error("Validation error: {}", bindingResult.getAllErrors());
-
-            throw new BindException(bindingResult);
-        }
-
-        authService.logout(accessToken);
+        authService.logout();
 
         return ResponseEntity.noContent().build();
     }

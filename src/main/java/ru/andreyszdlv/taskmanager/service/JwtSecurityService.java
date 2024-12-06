@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.andreyszdlv.taskmanager.exception.InvalidTokenException;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -25,21 +26,21 @@ public class JwtSecurityService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(long userId, String role){
+    public String generateToken(String userEmail, String role){
         log.info("Executing generateToken in JwtSecurityService");
         return Jwts.builder()
                 .claims(Map.of("role", role))
-                .subject(String.valueOf(userId))
+                .subject(userEmail)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    public String generateRefreshToken(long userId, String role) {
+    public String generateRefreshToken(String userEmail, String role) {
         log.info("Executing generateRefreshToken in JwtSecurityService");
         return Jwts.builder()
                 .claims(Map.of("role", role))
-                .subject(String.valueOf(userId))
+                .subject(String.valueOf(userEmail))
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .signWith(getSigningKey())
                 .compact();
@@ -51,16 +52,22 @@ public class JwtSecurityService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        log.info("extractAllClaims");
+        try {
+            return Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        }
+        catch (Exception e) {
+            throw new InvalidTokenException();
+        }
     }
 
-    public long extractUserId(String token) {
-        log.info("Extract userId from token");
-        return Long.parseLong(extractClaim(token, Claims::getSubject));
+    public String extractUserEmail(String token) {
+        log.info("Extract user email from token");
+        return extractClaim(token, Claims::getSubject);
     }
 
     public String extractRole(String token) {

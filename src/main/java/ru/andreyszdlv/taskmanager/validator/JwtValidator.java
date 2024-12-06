@@ -3,7 +3,9 @@ package ru.andreyszdlv.taskmanager.validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.andreyszdlv.taskmanager.exception.InvalidRefreshTokenException;
 import ru.andreyszdlv.taskmanager.exception.InvalidTokenException;
+import ru.andreyszdlv.taskmanager.exception.UserUnauthorizedException;
 import ru.andreyszdlv.taskmanager.service.AccessAndRefreshJwtService;
 import ru.andreyszdlv.taskmanager.service.JwtSecurityService;
 
@@ -19,22 +21,23 @@ public class JwtValidator {
     private final JwtSecurityService jwtSecurityService;
 
     public void validateAccess(String token) {
-        long userId = jwtSecurityService.extractUserId(token);
+        String userEmail = jwtSecurityService.extractUserEmail(token);
 
-        String expectedAccessToken = accessAndRefreshJwtService.getAccessTokenByUserId(userId);
+        String expectedAccessToken = accessAndRefreshJwtService.getAccessTokenByUserEmail(userEmail);
 
         if(Objects.isNull(expectedAccessToken) || !expectedAccessToken.equals(token)) {
-            throw new InvalidTokenException("error.409.token.invalid");
+            throw new InvalidTokenException();
         }
     }
 
     public void validateRefresh(String token) {
-        long userId = jwtSecurityService.extractUserId(token);
 
-        String expectedRefreshToken = accessAndRefreshJwtService.getAccessTokenByUserId(userId);
+        String userEmail = jwtSecurityService.extractUserEmail(token);
+
+        String expectedRefreshToken = accessAndRefreshJwtService.getRefreshTokenByUserEmail(userEmail);
 
         if(Objects.isNull(expectedRefreshToken) || !expectedRefreshToken.equals(token)) {
-            throw new InvalidTokenException("error.409.token.invalid");
+            throw new InvalidRefreshTokenException("error.409.refresh_token.invalid");
         }
     }
 }

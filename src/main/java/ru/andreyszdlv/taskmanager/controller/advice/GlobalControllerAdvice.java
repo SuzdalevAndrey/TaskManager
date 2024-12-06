@@ -8,9 +8,10 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.andreyszdlv.taskmanager.exception.InvalidTokenException;
+import ru.andreyszdlv.taskmanager.exception.InvalidRefreshTokenException;
 import ru.andreyszdlv.taskmanager.exception.UserAlreadyExsitsException;
 import ru.andreyszdlv.taskmanager.exception.UserNotFoundException;
+import ru.andreyszdlv.taskmanager.exception.UserUnauthorizedException;
 
 import java.util.Locale;
 
@@ -22,7 +23,7 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler({
             UserAlreadyExsitsException.class,
-            InvalidTokenException.class
+            InvalidRefreshTokenException.class
     })
     public ProblemDetail handleConflictException(RuntimeException ex, Locale locale) {
         return ProblemDetail.forStatusAndDetail(
@@ -54,4 +55,13 @@ public class GlobalControllerAdvice {
         );
     }
 
+    @ExceptionHandler({
+            UserUnauthorizedException.class
+    })
+    public ProblemDetail handleUnauthorizedException(RuntimeException ex, Locale locale) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED,
+                messageSource.getMessage(ex.getMessage(), null, locale)
+        );
+    }
 }

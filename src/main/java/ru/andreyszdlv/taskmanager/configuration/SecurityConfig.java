@@ -1,6 +1,5 @@
 package ru.andreyszdlv.taskmanager.configuration;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ru.andreyszdlv.taskmanager.filter.JwtAuthenticationFilter;
 import ru.andreyszdlv.taskmanager.service.CustomUserDetailsService;
 
 @Configuration
@@ -22,6 +23,8 @@ import ru.andreyszdlv.taskmanager.service.CustomUserDetailsService;
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -43,22 +46,21 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(
-                        req -> req
-                                .requestMatchers("/api/auth/logout").authenticated()
-                                .anyRequest().permitAll()
+                .authorizeHttpRequests(req -> req
+                        .requestMatchers("/api/auth/logout").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/admin").hasAuthority("ADMIN")
+                        .requestMatchers("/api/tasks").hasAnyAuthority("ADMIN","USER")
+                        .requestMatchers("/api/user").hasAnyAuthority("USER")
+                        .anyRequest().authenticated()
                 )
-                .sessionManagement(m -> m.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) ->
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
-                );
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return httpSecurity.build();
+        return http.build();
     }
 }
