@@ -10,5 +10,5 @@ public interface AccessAndRefreshJwtService {
 
     String getRefreshTokenByUserEmail(String userEmail);
 
-    void deleteByUserId(String userEmail);
+    void deleteByUserEmail(String userEmail);
 }

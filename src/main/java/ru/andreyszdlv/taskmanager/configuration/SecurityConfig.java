@@ -52,9 +52,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/api/auth/logout").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/admin").hasAuthority("ADMIN")
                         .requestMatchers("/api/tasks").hasAnyAuthority("ADMIN","USER")
-                        .requestMatchers("/api/user").hasAnyAuthority("USER")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

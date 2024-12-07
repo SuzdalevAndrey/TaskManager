@@ -1,6 +1,7 @@
 package ru.andreyszdlv.taskmanager.controller.advice;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -11,12 +12,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.andreyszdlv.taskmanager.exception.InvalidRefreshTokenException;
 import ru.andreyszdlv.taskmanager.exception.UserAlreadyExsitsException;
 import ru.andreyszdlv.taskmanager.exception.UserNotFoundException;
-import ru.andreyszdlv.taskmanager.exception.UserUnauthorizedException;
+import ru.andreyszdlv.taskmanager.exception.UserUnauthenticatedException;
 
 import java.util.Locale;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
+@Slf4j
 public class GlobalControllerAdvice {
 
     private final MessageSource messageSource;
@@ -26,42 +28,57 @@ public class GlobalControllerAdvice {
             InvalidRefreshTokenException.class
     })
     public ProblemDetail handleConflictException(RuntimeException ex, Locale locale) {
-        return ProblemDetail.forStatusAndDetail(
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 messageSource.getMessage(ex.getMessage(), null, locale)
         );
+
+        log.error("handleConflictException: {}", response);
+
+        return response;
     }
 
     @ExceptionHandler({BindException.class})
-    public ProblemDetail handleConflictException(BindException ex, Locale locale) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+    public ProblemDetail handleBadRequestException(BindException ex, Locale locale) {
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST,
                 messageSource.getMessage("validation.error.title", null, locale)
         );
-        problemDetail.setProperty(
+        response.setProperty(
                 "errors",
                 ex.getAllErrors().stream().map(ObjectError::getDefaultMessage).toList()
         );
-        return problemDetail;
+
+        log.error("handleBadRequestException: {}", response);
+
+        return response;
     }
 
     @ExceptionHandler({
             UserNotFoundException.class
     })
     public ProblemDetail handleNotFoundException(RuntimeException ex, Locale locale) {
-        return ProblemDetail.forStatusAndDetail(
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 messageSource.getMessage(ex.getMessage(), null, locale)
         );
+
+        log.error("handleNotFoundException: {}", response);
+
+        return response;
     }
 
     @ExceptionHandler({
-            UserUnauthorizedException.class
+            UserUnauthenticatedException.class
     })
     public ProblemDetail handleUnauthorizedException(RuntimeException ex, Locale locale) {
-        return ProblemDetail.forStatusAndDetail(
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(
                 HttpStatus.UNAUTHORIZED,
                 messageSource.getMessage(ex.getMessage(), null, locale)
         );
+
+        log.error("handleUnauthorizedException: {}", response);
+
+        return response;
     }
 }

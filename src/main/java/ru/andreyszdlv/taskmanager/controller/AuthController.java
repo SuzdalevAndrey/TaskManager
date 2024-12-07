@@ -1,10 +1,8 @@
 package ru.andreyszdlv.taskmanager.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -33,7 +31,7 @@ public class AuthController {
             throw new BindException(bindingResult);
         }
 
-        log.info("Validation successfully registering user with email: {}", registerUserRequestDto.email());
+        log.info("Validation successfully, registering user with email: {}", registerUserRequestDto.email());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(authService.registerUser(registerUserRequestDto));
@@ -50,7 +48,7 @@ public class AuthController {
             throw new BindException(bindingResult);
         }
 
-        log.info("Validation successfully login user with email: {}", loginRequestDto.email());
+        log.info("Validation successfully, login user with email: {}", loginRequestDto.email());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(authService.loginUser(loginRequestDto));
@@ -68,7 +66,7 @@ public class AuthController {
             throw new BindException(bindingResult);
         }
 
-        log.info("Validation successfully refresh token");
+        log.info("Validation successfully, refreshing token");
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(authService.refreshToken(requestDto));
@@ -76,6 +74,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(){
+        log.info("Logout user");
 
         authService.logout();
 

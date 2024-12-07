@@ -27,7 +27,7 @@ public class JwtSecurityService {
     }
 
     public String generateToken(String userEmail, String role){
-        log.info("Executing generateToken in JwtSecurityService");
+        log.info("Generating access token for userEmail: {}", userEmail);
         return Jwts.builder()
                 .claims(Map.of("role", role))
                 .subject(userEmail)
@@ -37,7 +37,7 @@ public class JwtSecurityService {
     }
 
     public String generateRefreshToken(String userEmail, String role) {
-        log.info("Executing generateRefreshToken in JwtSecurityService");
+        log.info("Generating refresh token for userEmail: {}", userEmail);
         return Jwts.builder()
                 .claims(Map.of("role", role))
                 .subject(String.valueOf(userEmail))
@@ -52,7 +52,7 @@ public class JwtSecurityService {
     }
 
     private Claims extractAllClaims(String token) {
-        log.info("extractAllClaims");
+        log.info("Extract all claims from token");
         try {
             return Jwts.parser()
                     .verifyWith(getSigningKey())
@@ -61,6 +61,7 @@ public class JwtSecurityService {
                     .getPayload();
         }
         catch (Exception e) {
+            log.error("Extract failed");
             throw new InvalidTokenException();
         }
     }

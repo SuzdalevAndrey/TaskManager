@@ -38,26 +38,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = resolveToken(request);
+        String token = extractToken(request);
 
         try {
             if (token != null) {
-
                 jwtValidator.validateAccess(token);
 
                 String username = jwtSecurityService.extractUserEmail(token);
+                log.info("Extracted username: {}", username);
+
+                String role = jwtSecurityService.extractRole(token);
+                log.info("Extracted role: {}", role);
 
                 List<GrantedAuthority> authorities =
-                        List.of(new SimpleGrantedAuthority(jwtSecurityService.extractRole(token)));
+                        List.of(new SimpleGrantedAuthority(role));
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(auth);
+
+                log.info("User authenticated: {}", username);
             }
 
             filterChain.doFilter(request, response);
         }
         catch (InvalidTokenException ex) {
-            log.error("Invalid token");
+            log.error("Invalid token, send response unauthorized for user");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("text/plain; charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
@@ -67,11 +72,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private String resolveToken(HttpServletRequest request) {
+    private String extractToken(HttpServletRequest request) {
+        log.info("Extract token from request header");
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            log.info("token != null");
             return bearerToken.substring(7);
         }
+        log.info("token == null");
         return null;
     }
 }

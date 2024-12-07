@@ -1,6 +1,7 @@
 package ru.andreyszdlv.taskmanager.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -11,6 +12,7 @@ import ru.andreyszdlv.taskmanager.service.JwtSecurityService;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AccessAndRefreshJwtCacheServiceImpl implements AccessAndRefreshJwtService {
 
     private final JwtSecurityService jwtSecurityService;
@@ -27,11 +29,13 @@ public class AccessAndRefreshJwtCacheServiceImpl implements AccessAndRefreshJwtS
 
     @Cacheable(value = "${spring.redis.accessTokenNameCache}", key = "#userEmail")
     public String getAccessTokenByUserEmail(String userEmail){
+        log.info("Get access token for userEmail: {}", userEmail);
         return null;
     }
 
     @Cacheable(value = "${spring.redis.refreshTokenNameCache}", key = "#userEmail")
     public String getRefreshTokenByUserEmail(String userEmail){
+        log.info("Get refresh token for userEmail: {}", userEmail);
         return null;
     }
 
@@ -39,6 +43,8 @@ public class AccessAndRefreshJwtCacheServiceImpl implements AccessAndRefreshJwtS
             @CacheEvict(value = "${spring.redis.accessTokenNameCache}", key = "#userEmail"),
             @CacheEvict(value = "${spring.redis.refreshTokenNameCache}", key = "#userEmail")
     })
-    public void deleteByUserId(String userEmail){}
+    public void deleteByUserEmail(String userEmail){
+        log.info("Delete access and refresh token for userEmail: {}", userEmail);
+    }
 
 }
