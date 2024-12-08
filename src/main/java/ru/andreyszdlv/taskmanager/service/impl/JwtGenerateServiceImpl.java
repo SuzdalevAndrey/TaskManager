@@ -12,6 +12,7 @@ import ru.andreyszdlv.taskmanager.service.JwtGenerateService;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -38,8 +39,13 @@ public class JwtGenerateServiceImpl implements JwtGenerateService {
     }
 
     private String generateToken(String userEmail, Role role){
+        String uniqueId = UUID.randomUUID().toString();
+
         return Jwts.builder()
-                .claims(Map.of("role", role.name()))
+                .claims(Map.of(
+                        "role", role.name(),
+                        "uniqueId", uniqueId)
+                )
                 .subject(String.valueOf(userEmail))
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .signWith(getSigningKey())

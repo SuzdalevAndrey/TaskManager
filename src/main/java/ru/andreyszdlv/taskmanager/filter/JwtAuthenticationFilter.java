@@ -68,7 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setContentType("text/plain; charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(
-                    messageSource.getMessage("error.401.user.unauthorized", null, request.getLocale())
+                    messageSource.getMessage("error.401.user.unauthorized", null,"error.401.user.unauthorized", request.getLocale())
             );
         }
     }
