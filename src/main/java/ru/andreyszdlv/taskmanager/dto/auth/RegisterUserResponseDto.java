@@ -1,4 +1,4 @@
-package ru.andreyszdlv.taskmanager.dto;
+package ru.andreyszdlv.taskmanager.dto.auth;
 
 public record RegisterUserResponseDto(
         long id,

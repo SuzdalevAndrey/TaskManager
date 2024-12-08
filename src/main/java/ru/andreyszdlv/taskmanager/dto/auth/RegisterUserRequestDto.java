@@ -1,4 +1,4 @@
-package ru.andreyszdlv.taskmanager.dto;
+package ru.andreyszdlv.taskmanager.dto.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

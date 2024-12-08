@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.exception.UserAlreadyExsitsException;
+import ru.andreyszdlv.taskmanager.exception.UserNotFoundException;
+import ru.andreyszdlv.taskmanager.model.User;
 import ru.andreyszdlv.taskmanager.repository.UserRepository;
 
 @Component
@@ -22,5 +24,21 @@ public class UserValidator {
             throw new UserAlreadyExsitsException("error.409.user.already_exists");
         }
         log.info("User with email {} no exists", email);
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserOrElseThrow(long userId){
+        return userRepository.findById(userId)
+                .orElseThrow(
+                        () -> new UserNotFoundException("error.404.user.not_found")
+                );
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserOrElseThrow(String email){
+        return userRepository.findByEmail(email)
+                .orElseThrow(
+                        () -> new UserNotFoundException("error.404.user.not_found")
+                );
     }
 }

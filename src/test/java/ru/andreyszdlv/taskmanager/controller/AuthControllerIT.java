@@ -18,7 +18,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-import ru.andreyszdlv.taskmanager.dto.*;
+import ru.andreyszdlv.taskmanager.dto.auth.*;
 import ru.andreyszdlv.taskmanager.enums.Role;
 import ru.andreyszdlv.taskmanager.model.User;
 import ru.andreyszdlv.taskmanager.repository.UserRepository;

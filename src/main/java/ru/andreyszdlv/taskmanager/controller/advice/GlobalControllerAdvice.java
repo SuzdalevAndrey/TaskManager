@@ -9,9 +9,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.andreyszdlv.taskmanager.exception.InvalidRefreshTokenException;
-import ru.andreyszdlv.taskmanager.exception.UserAlreadyExsitsException;
-import ru.andreyszdlv.taskmanager.exception.UserUnauthenticatedException;
+import ru.andreyszdlv.taskmanager.exception.*;
 
 import java.util.Locale;
 
@@ -29,7 +27,7 @@ public class GlobalControllerAdvice {
     public ProblemDetail handleConflictException(RuntimeException ex, Locale locale) {
         ProblemDetail response = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
-                messageSource.getMessage(ex.getMessage(), null, locale)
+                messageSource.getMessage(ex.getMessage(), null, ex.getMessage(), locale)
         );
 
         log.error("handleConflictException: {}", response);
@@ -41,7 +39,7 @@ public class GlobalControllerAdvice {
     public ProblemDetail handleBadRequestException(BindException ex, Locale locale) {
         ProblemDetail response = ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST,
-                messageSource.getMessage("validation.error.title", null, locale)
+                messageSource.getMessage("validation.error.title", null, "validation.error.title", locale)
         );
         response.setProperty(
                 "errors",
@@ -59,10 +57,25 @@ public class GlobalControllerAdvice {
     public ProblemDetail handleUnauthorizedException(RuntimeException ex, Locale locale) {
         ProblemDetail response = ProblemDetail.forStatusAndDetail(
                 HttpStatus.UNAUTHORIZED,
-                messageSource.getMessage(ex.getMessage(), null, locale)
+                messageSource.getMessage(ex.getMessage(), null, ex.getMessage(), locale)
         );
 
         log.error("handleUnauthorizedException: {}", response);
+
+        return response;
+    }
+
+    @ExceptionHandler({
+            TaskNotFoundException.class,
+            UserNotFoundException.class
+    })
+    public ProblemDetail handleNotFoundException(RuntimeException ex, Locale locale) {
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                messageSource.getMessage(ex.getMessage(), null, ex.getMessage(), locale)
+        );
+
+        log.error("handleNotFoundException: {}", response);
 
         return response;
     }

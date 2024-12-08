@@ -9,7 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.andreyszdlv.taskmanager.dto.*;
+import ru.andreyszdlv.taskmanager.dto.auth.*;
 import ru.andreyszdlv.taskmanager.enums.Role;
 import ru.andreyszdlv.taskmanager.exception.InvalidRefreshTokenException;
 import ru.andreyszdlv.taskmanager.exception.UserAlreadyExsitsException;
