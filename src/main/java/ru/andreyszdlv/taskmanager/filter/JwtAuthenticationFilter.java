@@ -14,8 +14,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.andreyszdlv.taskmanager.enums.Role;
 import ru.andreyszdlv.taskmanager.exception.InvalidTokenException;
-import ru.andreyszdlv.taskmanager.service.JwtSecurityService;
+import ru.andreyszdlv.taskmanager.service.JwtExtractorService;
 import ru.andreyszdlv.taskmanager.validator.JwtValidator;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final MessageSource messageSource;
 
-    private final JwtSecurityService jwtSecurityService;
+    private final JwtExtractorService jwtExtractorService;
 
     private final JwtValidator jwtValidator;
 
@@ -42,16 +43,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             if (token != null) {
-                jwtValidator.validateAccess(token);
+                jwtValidator.validateAccessToken(token);
 
-                String username = jwtSecurityService.extractUserEmail(token);
+                String username = jwtExtractorService.extractUserEmail(token);
                 log.info("Extracted username: {}", username);
 
-                String role = jwtSecurityService.extractRole(token);
+                Role role = jwtExtractorService.extractRole(token);
                 log.info("Extracted role: {}", role);
 
                 List<GrantedAuthority> authorities =
-                        List.of(new SimpleGrantedAuthority(role));
+                        List.of(new SimpleGrantedAuthority(role.name()));
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(auth);

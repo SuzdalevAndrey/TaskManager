@@ -3,17 +3,21 @@ package ru.andreyszdlv.taskmanager.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.dto.*;
 import ru.andreyszdlv.taskmanager.enums.Role;
+import ru.andreyszdlv.taskmanager.exception.UserNotFoundException;
+import ru.andreyszdlv.taskmanager.exception.UserUnauthenticatedException;
 import ru.andreyszdlv.taskmanager.mapper.UserMapper;
 import ru.andreyszdlv.taskmanager.model.User;
 import ru.andreyszdlv.taskmanager.repository.UserRepository;
-import ru.andreyszdlv.taskmanager.util.SecurityUtils;
 import ru.andreyszdlv.taskmanager.validator.JwtValidator;
 import ru.andreyszdlv.taskmanager.validator.UserValidator;
 
@@ -32,11 +36,13 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
 
-    private final JwtSecurityService jwtSecurityService;
+    private final JwtExtractorService jwtExtractorService;
 
-    private final AccessAndRefreshJwtService accessAndRefreshJwtService;
+    private final JwtStorageService jwtStorageService;
 
     private final JwtValidator jwtValidator;
+
+    private final SecurityContextService securityContextService;
 
     @Transactional
     public RegisterUserResponseDto registerUser(RegisterUserRequestDto registerUserRequestDto) {
@@ -44,9 +50,7 @@ public class AuthService {
 
         userValidator.checkUserExists(registerUserRequestDto.email());
 
-        User user = userMapper.toUser(registerUserRequestDto);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(Role.USER);
+        User user = createUser(registerUserRequestDto);
 
         log.info("User registered successfully with email: {}", registerUserRequestDto.email());
         return userMapper.toRegisterUserResponseDto(userRepository.save(user));
@@ -56,14 +60,20 @@ public class AuthService {
     public LoginResponseDto loginUser(LoginRequestDto loginRequestDto) {
         log.info("User login for email: {}", loginRequestDto.email());
 
-        Authentication authentication = authenticateUser(loginRequestDto);
-        User user = (User) authentication.getPrincipal();
+        try {
+            Authentication authentication = authenticateUser(loginRequestDto);
+            User user = (User) authentication.getPrincipal();
 
-        String accessToken = accessAndRefreshJwtService.generateAccessToken(user.getEmail(), user.getRole().name());
-        String refreshToken = accessAndRefreshJwtService.generateRefreshToken(user.getEmail(), user.getRole().name());
+            String accessToken = jwtStorageService.generateAccessToken(user.getEmail(), user.getRole());
+            String refreshToken = jwtStorageService.generateRefreshToken(user.getEmail(), user.getRole());
 
-        log.info("User login successfully with email: {}", loginRequestDto.email());
-        return new LoginResponseDto(accessToken, refreshToken);
+            log.info("User login successfully with email: {}", loginRequestDto.email());
+            return new LoginResponseDto(accessToken, refreshToken);
+        }
+        catch (AuthenticationException ex){
+            log.error("Authentication failed for: {}", loginRequestDto.email());
+            throw new UserUnauthenticatedException("error.401.user.unauthenticated");
+        }
     }
 
     public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto requestDto) {
@@ -71,15 +81,15 @@ public class AuthService {
 
         String refreshToken = requestDto.refreshToken();
 
-        jwtValidator.validateRefresh(refreshToken);
+        jwtValidator.validateRefreshToken(refreshToken);
 
-        String userEmail = jwtSecurityService.extractUserEmail(refreshToken);
+        String userEmail = jwtExtractorService.extractUserEmail(refreshToken);
         log.info("Extracted user email: {}", userEmail);
 
-        String role = jwtSecurityService.extractRole(refreshToken);
+        Role role = jwtExtractorService.extractRole(refreshToken);
         log.info("Extracted user role: {}", role);
 
-        String accessToken = accessAndRefreshJwtService.generateAccessToken(userEmail, role);
+        String accessToken = jwtStorageService.generateAccessToken(userEmail, role);
 
         log.info("Token refresh successfully for user: {}", userEmail);
         return RefreshTokenResponseDto
@@ -90,10 +100,10 @@ public class AuthService {
     }
 
     public void logout() {
-        String userEmail = SecurityUtils.getCurrentUserName();
+        String userEmail = securityContextService.getCurrentUserName();
 
         log.info("User with email {} logout successfully", userEmail);
-        accessAndRefreshJwtService.deleteByUserEmail(userEmail);
+        jwtStorageService.deleteByUserEmail(userEmail);
     }
 
     private Authentication authenticateUser(LoginRequestDto loginRequestDto) {
@@ -104,5 +114,13 @@ public class AuthService {
                         loginRequestDto.password()
                 )
         );
+    }
+
+    private User createUser(RegisterUserRequestDto registerUserRequestDto) {
+        log.debug("Creating new user for email: {}", registerUserRequestDto.email());
+        User user = userMapper.toUser(registerUserRequestDto);
+        user.setPassword(passwordEncoder.encode(registerUserRequestDto.password()));
+        user.setRole(Role.USER);
+        return user;
     }
 }

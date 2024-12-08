@@ -1,10 +1,12 @@
 package ru.andreyszdlv.taskmanager.service;
 
-public interface AccessAndRefreshJwtService {
+import ru.andreyszdlv.taskmanager.enums.Role;
 
-    String generateAccessToken(String userEmail, String role);
+public interface JwtStorageService {
 
-    String generateRefreshToken(String userEmail, String role);
+    String generateAccessToken(String userEmail, Role role);
+
+    String generateRefreshToken(String userEmail, Role role);
 
     String getAccessTokenByUserEmail(String userEmail);
 

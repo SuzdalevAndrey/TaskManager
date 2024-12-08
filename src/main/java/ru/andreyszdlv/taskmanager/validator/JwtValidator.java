@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.andreyszdlv.taskmanager.exception.InvalidRefreshTokenException;
 import ru.andreyszdlv.taskmanager.exception.InvalidTokenException;
-import ru.andreyszdlv.taskmanager.service.AccessAndRefreshJwtService;
-import ru.andreyszdlv.taskmanager.service.JwtSecurityService;
+import ru.andreyszdlv.taskmanager.service.JwtStorageService;
+import ru.andreyszdlv.taskmanager.service.JwtExtractorService;
 
 import java.util.Objects;
 
@@ -15,17 +15,17 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class JwtValidator {
 
-    private final AccessAndRefreshJwtService accessAndRefreshJwtService;
+    private final JwtStorageService jwtStorageService;
 
-    private final JwtSecurityService jwtSecurityService;
+    private final JwtExtractorService jwtExtractorService;
 
-    public void validateAccess(String token) {
+    public void validateAccessToken(String token) {
         log.info("Validating access token");
 
-        String userEmail = jwtSecurityService.extractUserEmail(token);
+        String userEmail = jwtExtractorService.extractUserEmail(token);
         log.info("Extract userEmail from access token: {}", userEmail);
 
-        String expectedAccessToken = accessAndRefreshJwtService.getAccessTokenByUserEmail(userEmail);
+        String expectedAccessToken = jwtStorageService.getAccessTokenByUserEmail(userEmail);
 
         if(Objects.isNull(expectedAccessToken) || !expectedAccessToken.equals(token)) {
             log.error("Access token validation failed for: {}", userEmail);
@@ -35,13 +35,13 @@ public class JwtValidator {
         log.info("Access token validation successful for: {}", userEmail);
     }
 
-    public void validateRefresh(String token) {
+    public void validateRefreshToken(String token) {
         log.info("Validating refresh token");
 
-        String userEmail = jwtSecurityService.extractUserEmail(token);
+        String userEmail = jwtExtractorService.extractUserEmail(token);
         log.info("Extract userEmail from refresh token: {}", userEmail);
 
-        String expectedRefreshToken = accessAndRefreshJwtService.getRefreshTokenByUserEmail(userEmail);
+        String expectedRefreshToken = jwtStorageService.getRefreshTokenByUserEmail(userEmail);
 
         if(Objects.isNull(expectedRefreshToken) || !expectedRefreshToken.equals(token)) {
             log.error("Refresh token validation failed for: {}", userEmail);

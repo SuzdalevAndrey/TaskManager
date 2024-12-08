@@ -7,24 +7,25 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
-import ru.andreyszdlv.taskmanager.service.AccessAndRefreshJwtService;
-import ru.andreyszdlv.taskmanager.service.JwtSecurityService;
+import ru.andreyszdlv.taskmanager.enums.Role;
+import ru.andreyszdlv.taskmanager.service.JwtGenerateService;
+import ru.andreyszdlv.taskmanager.service.JwtStorageService;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AccessAndRefreshJwtCacheServiceImpl implements AccessAndRefreshJwtService {
+public class JwtCacheStorageServiceImpl implements JwtStorageService {
 
-    private final JwtSecurityService jwtSecurityService;
+    private final JwtGenerateService jwtGenerateService;
 
     @CachePut(value = "${spring.redis.accessTokenNameCache}", key = "#userEmail")
-    public String generateAccessToken(String userEmail, String role){
-        return jwtSecurityService.generateToken(userEmail, role);
+    public String generateAccessToken(String userEmail, Role role){
+        return jwtGenerateService.generateAccessToken(userEmail, role);
     }
 
     @CachePut(value = "${spring.redis.refreshTokenNameCache}", key = "#userEmail")
-    public String generateRefreshToken(String userEmail, String role){
-        return jwtSecurityService.generateRefreshToken(userEmail, role);
+    public String generateRefreshToken(String userEmail, Role role){
+        return jwtGenerateService.generateRefreshToken(userEmail, role);
     }
 
     @Cacheable(value = "${spring.redis.accessTokenNameCache}", key = "#userEmail")
@@ -46,5 +47,4 @@ public class AccessAndRefreshJwtCacheServiceImpl implements AccessAndRefreshJwtS
     public void deleteByUserEmail(String userEmail){
         log.info("Delete access and refresh token for userEmail: {}", userEmail);
     }
-
 }

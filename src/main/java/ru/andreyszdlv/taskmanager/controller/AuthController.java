@@ -49,9 +49,7 @@ public class AuthController {
         }
 
         log.info("Validation successfully, login user with email: {}", loginRequestDto.email());
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(authService.loginUser(loginRequestDto));
+        return ResponseEntity.ok(authService.loginUser(loginRequestDto));
     }
 
     @PostMapping("/refresh")

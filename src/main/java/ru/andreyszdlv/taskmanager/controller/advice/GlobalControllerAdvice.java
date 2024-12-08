@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.andreyszdlv.taskmanager.exception.InvalidRefreshTokenException;
 import ru.andreyszdlv.taskmanager.exception.UserAlreadyExsitsException;
-import ru.andreyszdlv.taskmanager.exception.UserNotFoundException;
 import ru.andreyszdlv.taskmanager.exception.UserUnauthenticatedException;
 
 import java.util.Locale;
@@ -50,20 +49,6 @@ public class GlobalControllerAdvice {
         );
 
         log.error("handleBadRequestException: {}", response);
-
-        return response;
-    }
-
-    @ExceptionHandler({
-            UserNotFoundException.class
-    })
-    public ProblemDetail handleNotFoundException(RuntimeException ex, Locale locale) {
-        ProblemDetail response = ProblemDetail.forStatusAndDetail(
-                HttpStatus.NOT_FOUND,
-                messageSource.getMessage(ex.getMessage(), null, locale)
-        );
-
-        log.error("handleNotFoundException: {}", response);
 
         return response;
     }

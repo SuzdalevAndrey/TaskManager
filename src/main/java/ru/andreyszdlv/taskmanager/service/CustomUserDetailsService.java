@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
         log.info("Loading user with email: {}", username);
 
         return userRepository.findByEmail(username)
@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 })
                 .orElseThrow(() -> {
                     log.error("User not found for email: {}", username);
-                    return new UserNotFoundException("error.404.user.not_found");
+                    return new UsernameNotFoundException("User not found for email: " + username);
                 });
     }
 }
