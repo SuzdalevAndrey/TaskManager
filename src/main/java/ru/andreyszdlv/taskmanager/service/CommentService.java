@@ -1,20 +1,16 @@
 package ru.andreyszdlv.taskmanager.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.dto.comment.CommentDto;
 import ru.andreyszdlv.taskmanager.dto.comment.CreateCommentRequestDto;
 import ru.andreyszdlv.taskmanager.enums.Role;
+import ru.andreyszdlv.taskmanager.exception.CommentNotFoundException;
 import ru.andreyszdlv.taskmanager.mapper.CommentMapper;
 import ru.andreyszdlv.taskmanager.model.Comment;
 import ru.andreyszdlv.taskmanager.model.Task;
 import ru.andreyszdlv.taskmanager.repository.CommentRepository;
-import ru.andreyszdlv.taskmanager.validator.CommentValidator;
-import ru.andreyszdlv.taskmanager.validator.TaskValidator;
-import ru.andreyszdlv.taskmanager.validator.UserValidator;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -28,18 +24,16 @@ public class CommentService {
 
     private final CommentMapper commentMapper;
 
-    private final TaskValidator taskValidator;
+    private final TaskService taskService;
 
-    private final UserValidator userValidator;
+    private final UserService userService;
 
     private final SecurityContextService securityContextService;
-
-    private final CommentValidator commentValidator;
 
     @Transactional
     public CommentDto createComment(long taskId, CreateCommentRequestDto requestDto) {
 
-        Task task = taskValidator.getTaskByIdOrElseThrow(taskId);
+        Task task = taskService.getTaskByIdOrElseThrow(taskId);
 
         if(securityContextService.getCurrentUserRole() == Role.USER
                 && !task.getAssignee().getEmail().equals(securityContextService.getCurrentUserName())) {
@@ -48,7 +42,7 @@ public class CommentService {
 
         Comment comment = commentMapper.toComment(requestDto);
         comment.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        comment.setAuthor(userValidator.getUserOrElseThrow(securityContextService.getCurrentUserName()));
+        comment.setAuthor(userService.getUserOrElseThrow(securityContextService.getCurrentUserName()));
         comment.setTask(task);
 
         return commentMapper.toCommentDto(commentRepository.save(comment));
@@ -56,7 +50,7 @@ public class CommentService {
 
     @Transactional
     public void deleteComment(long commentId) {
-        Comment comment = commentValidator.getCommentByIdOrElseThrow(commentId);
+        Comment comment = this.getCommentByIdOrElseThrow(commentId);
 
         if(securityContextService.getCurrentUserRole() == Role.USER
                 && !comment.getAuthor().getEmail().equals(securityContextService.getCurrentUserName())) {
@@ -68,7 +62,7 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<CommentDto> getAllCommentsTaskByTaskId(long taskId) {
-        Task task = taskValidator.getTaskByIdOrElseThrow(taskId);
+        Task task = taskService.getTaskByIdOrElseThrow(taskId);
 
         if(securityContextService.getCurrentUserRole() == Role.USER
                 && !task.getAssignee().getEmail().equals(securityContextService.getCurrentUserName())) {
@@ -76,5 +70,12 @@ public class CommentService {
         }
 
         return task.getComments().stream().map(commentMapper::toCommentDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Comment getCommentByIdOrElseThrow(Long commentId) {
+        return commentRepository.findById(commentId).orElseThrow(
+                ()->new CommentNotFoundException("error.404.comment.not_found")
+        );
     }
 }

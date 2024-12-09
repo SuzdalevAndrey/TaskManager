@@ -15,8 +15,7 @@ import ru.andreyszdlv.taskmanager.exception.UserUnauthenticatedException;
 import ru.andreyszdlv.taskmanager.mapper.UserMapper;
 import ru.andreyszdlv.taskmanager.model.User;
 import ru.andreyszdlv.taskmanager.repository.UserRepository;
-import ru.andreyszdlv.taskmanager.validator.JwtValidator;
-import ru.andreyszdlv.taskmanager.validator.UserValidator;
+import ru.andreyszdlv.taskmanager.validation.JwtValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +24,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
 
-    private final UserValidator userValidator;
+    private final UserService userService;
 
     private final UserMapper userMapper;
 
@@ -45,7 +44,7 @@ public class AuthService {
     public RegisterUserResponseDto registerUser(RegisterUserRequestDto registerUserRequestDto) {
         log.info("Registering new user with email: {}", registerUserRequestDto.email());
 
-        userValidator.checkUserExists(registerUserRequestDto.email());
+        userService.checkUserExists(registerUserRequestDto.email());
 
         User user = createUser(registerUserRequestDto);
 

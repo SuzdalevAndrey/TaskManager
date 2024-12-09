@@ -8,6 +8,7 @@ import org.mockito.MockitoAnnotations;
 import ru.andreyszdlv.taskmanager.exception.InvalidTokenException;
 import ru.andreyszdlv.taskmanager.service.JwtExtractorService;
 import ru.andreyszdlv.taskmanager.service.JwtStorageService;
+import ru.andreyszdlv.taskmanager.validation.JwtValidator;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

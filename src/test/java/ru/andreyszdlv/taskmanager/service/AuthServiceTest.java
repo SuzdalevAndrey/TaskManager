@@ -17,8 +17,7 @@ import ru.andreyszdlv.taskmanager.exception.UserUnauthenticatedException;
 import ru.andreyszdlv.taskmanager.mapper.UserMapper;
 import ru.andreyszdlv.taskmanager.model.User;
 import ru.andreyszdlv.taskmanager.repository.UserRepository;
-import ru.andreyszdlv.taskmanager.validator.JwtValidator;
-import ru.andreyszdlv.taskmanager.validator.UserValidator;
+import ru.andreyszdlv.taskmanager.validation.JwtValidator;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -29,7 +28,7 @@ class AuthServiceTest {
     UserRepository userRepository;
 
     @Mock
-    UserValidator userValidator;
+    UserService userService;
 
     @Mock
     UserMapper userMapper;
@@ -80,7 +79,7 @@ class AuthServiceTest {
     @Test
     void registerUser_ThrowsException_WhenUserAlreadyExists() {
         RegisterUserRequestDto requestDto = new RegisterUserRequestDto("name", "email", "000000");
-        doThrow(UserAlreadyExsitsException.class).when(userValidator).checkUserExists(requestDto.email());
+        doThrow(UserAlreadyExsitsException.class).when(userService).checkUserExists(requestDto.email());
 
         assertThrows(
                 UserAlreadyExsitsException.class,

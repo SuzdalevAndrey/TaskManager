@@ -1,18 +1,18 @@
-package ru.andreyszdlv.taskmanager.validator;
+package ru.andreyszdlv.taskmanager.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.exception.UserAlreadyExsitsException;
 import ru.andreyszdlv.taskmanager.exception.UserNotFoundException;
 import ru.andreyszdlv.taskmanager.model.User;
 import ru.andreyszdlv.taskmanager.repository.UserRepository;
 
-@Component
+@Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserValidator {
+public class UserService {
 
     private final UserRepository userRepository;
 

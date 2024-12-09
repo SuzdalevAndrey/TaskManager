@@ -17,7 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import ru.andreyszdlv.taskmanager.enums.Role;
 import ru.andreyszdlv.taskmanager.exception.InvalidTokenException;
 import ru.andreyszdlv.taskmanager.service.JwtExtractorService;
-import ru.andreyszdlv.taskmanager.validator.JwtValidator;
+import ru.andreyszdlv.taskmanager.validation.JwtValidator;
 
 import java.io.IOException;
 import java.util.List;

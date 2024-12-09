@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import ru.andreyszdlv.taskmanager.exception.UserAlreadyExsitsException;
 import ru.andreyszdlv.taskmanager.repository.UserRepository;
+import ru.andreyszdlv.taskmanager.service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -17,7 +18,7 @@ class UserValidatorTest {
     UserRepository userRepository;
 
     @InjectMocks
-    UserValidator userValidator;
+    UserService userService;
 
     @BeforeEach
     void setUp() {
@@ -29,7 +30,7 @@ class UserValidatorTest {
         String email = "email@email.com";
         when(userRepository.existsByEmail(email)).thenReturn(false);
 
-        userValidator.checkUserExists(email);
+        userService.checkUserExists(email);
 
         verify(userRepository, times(1)).existsByEmail(email);
     }
@@ -41,7 +42,7 @@ class UserValidatorTest {
 
         assertThrows(
                 UserAlreadyExsitsException.class,
-                ()->userValidator.checkUserExists(email)
+                ()->userService.checkUserExists(email)
         );
 
         verify(userRepository, times(1)).existsByEmail(email);

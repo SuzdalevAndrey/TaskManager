@@ -1,4 +1,4 @@
-package ru.andreyszdlv.taskmanager.validator;
+package ru.andreyszdlv.taskmanager.validation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
