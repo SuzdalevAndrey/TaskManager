@@ -21,6 +21,7 @@ public record CreateTaskRequestDto(
         @NotNull(message = "{validation.error.task.priority.is_empty}")
         TaskPriority priority,
 
+        @NotNull(message = "{validation.error.task.status.is_empty}")
         TaskStatus status,
 
         @Min(value = 1, message = "{validation.error.task.assigneeId.invalid}")

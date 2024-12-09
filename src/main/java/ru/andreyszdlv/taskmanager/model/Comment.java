@@ -1,5 +1,6 @@
 package ru.andreyszdlv.taskmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -23,9 +24,11 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "c_task_id", nullable = false)
+    @JsonIgnore
     private Task task;
 
     @ManyToOne
     @JoinColumn(name = "c_author_id", nullable = false)
+    @JsonIgnore
     private User author;
 }

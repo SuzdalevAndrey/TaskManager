@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.dto.task.*;
+import ru.andreyszdlv.taskmanager.enums.TaskStatus;
 import ru.andreyszdlv.taskmanager.mapper.TaskMapper;
 import ru.andreyszdlv.taskmanager.model.Task;
 import ru.andreyszdlv.taskmanager.model.User;

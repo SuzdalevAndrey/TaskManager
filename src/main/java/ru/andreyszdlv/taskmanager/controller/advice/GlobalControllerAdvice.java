@@ -67,7 +67,8 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler({
             TaskNotFoundException.class,
-            UserNotFoundException.class
+            UserNotFoundException.class,
+            CommentNotFoundException.class
     })
     public ProblemDetail handleNotFoundException(RuntimeException ex, Locale locale) {
         ProblemDetail response = ProblemDetail.forStatusAndDetail(
