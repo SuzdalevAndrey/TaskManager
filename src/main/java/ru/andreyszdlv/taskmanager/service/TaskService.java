@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.dto.task.*;
-import ru.andreyszdlv.taskmanager.enums.TaskStatus;
 import ru.andreyszdlv.taskmanager.mapper.TaskMapper;
 import ru.andreyszdlv.taskmanager.model.Task;
 import ru.andreyszdlv.taskmanager.model.User;
@@ -32,34 +31,22 @@ public class TaskService {
     private final UserValidator userValidator;
 
     @Transactional
-    public CreateTaskResponseDto createTask(CreateTaskRequestDto requestDto){
+    public TaskDto createTask(CreateTaskRequestDto requestDto){
 
         Task task = taskMapper.toTask(requestDto);
-        task.setStatus(TaskStatus.WAITING);
         task.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         task.setAuthor(userValidator.getUserOrElseThrow(securityContextService.getCurrentUserName()));
-
-        return taskMapper.toCreateTaskResponseDto(taskRepository.save(task));
-    }
-
-    @Transactional
-    public UpdateTaskResponseDto updateTask(long taskId, UpdateTaskRequestDto requestDto) {
-        Task task = taskValidator.getTaskByIdOrElseThrow(taskId);
-
-        task.setStatus(requestDto.status());
-        task.setDescription(requestDto.description());
-        task.setPriority(requestDto.priority());
 
         if(requestDto.assigneeId() != null) {
             User assignee = userValidator.getUserOrElseThrow(requestDto.assigneeId());
             task.setAssignee(assignee);
         }
 
-        return taskMapper.toUpdateTaskResponseDto(task);
+        return taskMapper.toTaskDto(taskRepository.save(task));
     }
 
     @Transactional
-    public UpdateTaskPartialResponseDto updateTaskPartial(
+    public TaskDto updateTaskPartial(
             long taskId,
             UpdateTaskPartialRequestDto requestDto
     ) {
@@ -76,11 +63,12 @@ public class TaskService {
             task.setAssignee(assignee);
         }
 
-        return taskMapper.toUpdateTaskPartialResponseDto(task);
+        return taskMapper.toTaskDto(task);
     }
 
     @Transactional
     public void deleteTask(long taskId) {
+        taskValidator.checkTaskExists(taskId);
 
         taskRepository.deleteById(taskId);
     }

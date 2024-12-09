@@ -3,6 +3,7 @@ package ru.andreyszdlv.taskmanager.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -19,49 +20,32 @@ public class TaskController {
     private final TaskService taskService;
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<TaskDto> getAllTasks(){
-        return taskService.getAllTasks();
+    public ResponseEntity<List<TaskDto>> getAllTasks(){
+        return ResponseEntity.ok(taskService.getAllTasks());
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public TaskDto getTaskById(@PathVariable long id){
-        return taskService.getTaskById(id);
+    public ResponseEntity<TaskDto> getTaskById(@PathVariable long id){
+        return ResponseEntity.ok(taskService.getTaskById(id));
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public CreateTaskResponseDto createTask(
+    public ResponseEntity<TaskDto> createTask(
             @Valid @RequestBody CreateTaskRequestDto createTaskRequestDto,
             BindingResult bindingResult
     ) throws BindException {
 
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
         }
 
-        return taskService.createTask(createTaskRequestDto);
-    }
-
-    @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public UpdateTaskResponseDto updateTask(
-            @PathVariable long id,
-            @Valid @RequestBody UpdateTaskRequestDto updateTaskRequestDto,
-            BindingResult bindingResult
-    ) throws BindException {
-
-        if(bindingResult.hasErrors()) {
-            throw new BindException(bindingResult);
-        }
-
-        return taskService.updateTask(id, updateTaskRequestDto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(taskService.createTask(createTaskRequestDto));
     }
 
     @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public UpdateTaskPartialResponseDto updateTaskPartial(
+    public ResponseEntity<TaskDto> updateTaskPartial(
             @PathVariable long id,
             @Valid @RequestBody UpdateTaskPartialRequestDto updateTaskPartialRequestDto,
             BindingResult bindingResult
@@ -71,12 +55,12 @@ public class TaskController {
             throw new BindException(bindingResult);
         }
 
-        return taskService.updateTaskPartial(id, updateTaskPartialRequestDto);
+        return ResponseEntity.ok(taskService.updateTaskPartial(id, updateTaskPartialRequestDto));
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTask(@PathVariable long id) {
+    public ResponseEntity<Void> deleteTask(@PathVariable long id) {
         taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
     }
 }

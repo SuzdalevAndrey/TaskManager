@@ -26,7 +26,7 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "c_status", nullable = false)
-    private TaskStatus status;
+    private TaskStatus status = TaskStatus.WAITING;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "c_priority", nullable = false)

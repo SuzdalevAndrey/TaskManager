@@ -8,6 +8,7 @@ import ru.andreyszdlv.taskmanager.validation.NotBlankIfPresent;
 
 public record UpdateTaskPartialRequestDto(
         @Size(max = 255, message = "{validation.error.task.title.size.invalid}")
+        @NotBlankIfPresent(message = "{validation.error.task.title.not_blank}")
         String title,
 
         @Size(max = 1000, message = "{validation.error.task.title.size.invalid}")

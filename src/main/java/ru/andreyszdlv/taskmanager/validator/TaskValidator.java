@@ -25,6 +25,13 @@ public class TaskValidator {
                 );
     }
 
+    @Transactional(readOnly = true)
+    public void checkTaskExists(long taskId) {
+        if(!taskRepository.existsById(taskId)) {
+            throw new TaskNotFoundException("error.404.task.not_found");
+        }
+    }
+
     public void validateCurrentUserAssigneeTask(Task task) {
         if(!task.getAssignee().getEmail().equals(securityContextService.getCurrentUserName())){
             throw new AnotherUserAssigneeTaskException("error.409.task.assignee.another_user");

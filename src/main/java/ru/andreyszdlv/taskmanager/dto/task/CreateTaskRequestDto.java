@@ -1,9 +1,11 @@
 package ru.andreyszdlv.taskmanager.dto.task;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import ru.andreyszdlv.taskmanager.enums.TaskPriority;
+import ru.andreyszdlv.taskmanager.enums.TaskStatus;
 import ru.andreyszdlv.taskmanager.validation.NotBlankIfPresent;
 
 public record CreateTaskRequestDto(
@@ -17,5 +19,10 @@ public record CreateTaskRequestDto(
         String description,
 
         @NotNull(message = "{validation.error.task.priority.is_empty}")
-        TaskPriority priority
+        TaskPriority priority,
+
+        TaskStatus status,
+
+        @Min(value = 1, message = "{validation.error.task.assigneeId.invalid}")
+        Long assigneeId
 ) { }

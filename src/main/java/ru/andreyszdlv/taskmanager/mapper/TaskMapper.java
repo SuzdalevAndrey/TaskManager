@@ -9,15 +9,8 @@ import ru.andreyszdlv.taskmanager.model.Task;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface TaskMapper {
 
-    CreateTaskResponseDto toCreateTaskResponseDto(Task task);
-
     Task toTask(CreateTaskRequestDto createTaskRequestDto);
 
     @Mapping(target = "assigneeId", source = "assignee.id")
     TaskDto toTaskDto(Task task);
-
-    UpdateTaskResponseDto toUpdateTaskResponseDto(Task task);
-
-    @Mapping(target = "assigneeId", source = "assignee.id")
-    UpdateTaskPartialResponseDto toUpdateTaskPartialResponseDto(Task task);
 }
