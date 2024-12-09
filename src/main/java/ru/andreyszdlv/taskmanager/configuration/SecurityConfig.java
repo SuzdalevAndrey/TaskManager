@@ -52,7 +52,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/api/auth/logout").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/tasks").hasAnyAuthority("ADMIN","USER")
+                        .requestMatchers("/api/admin/tasks/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/tasks/**").hasAuthority("USER")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

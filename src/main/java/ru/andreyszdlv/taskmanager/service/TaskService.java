@@ -1,21 +1,19 @@
 package ru.andreyszdlv.taskmanager.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.dto.task.*;
 import ru.andreyszdlv.taskmanager.enums.TaskStatus;
-import ru.andreyszdlv.taskmanager.exception.TaskNotFoundException;
 import ru.andreyszdlv.taskmanager.mapper.TaskMapper;
 import ru.andreyszdlv.taskmanager.model.Task;
 import ru.andreyszdlv.taskmanager.model.User;
 import ru.andreyszdlv.taskmanager.repository.TaskRepository;
-import ru.andreyszdlv.taskmanager.repository.UserRepository;
 import ru.andreyszdlv.taskmanager.validator.TaskValidator;
 import ru.andreyszdlv.taskmanager.validator.UserValidator;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +23,6 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
 
-    private final UserRepository userRepository;
-
     private final SecurityContextService securityContextService;
 
     private final TaskMapper taskMapper;
@@ -35,18 +31,15 @@ public class TaskService {
 
     private final UserValidator userValidator;
 
+    @Transactional
     public CreateTaskResponseDto createTask(CreateTaskRequestDto requestDto){
 
         Task task = taskMapper.toTask(requestDto);
         task.setStatus(TaskStatus.WAITING);
-        task.setCreatedAt(LocalDateTime.now());
+        task.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         task.setAuthor(userValidator.getUserOrElseThrow(securityContextService.getCurrentUserName()));
 
         return taskMapper.toCreateTaskResponseDto(taskRepository.save(task));
-    }
-
-    public List<TaskDto> getAllTasks() {
-        return taskRepository.findAll().stream().map(taskMapper::toTaskDto).toList();
     }
 
     @Transactional
@@ -90,5 +83,15 @@ public class TaskService {
     public void deleteTask(long taskId) {
 
         taskRepository.deleteById(taskId);
+    }
+
+    @Transactional(readOnly = true)
+    public TaskDto getTaskById(long taskId) {
+        return taskMapper.toTaskDto(taskValidator.getTaskByIdOrElseThrow(taskId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<TaskDto> getAllTasks() {
+        return taskRepository.findAll().stream().map(taskMapper::toTaskDto).toList();
     }
 }

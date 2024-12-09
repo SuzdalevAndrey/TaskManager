@@ -6,6 +6,8 @@ import ru.andreyszdlv.taskmanager.enums.TaskStatus;
 import java.time.LocalDateTime;
 
 public record TaskDto(
+        long id,
+
         String title,
 
         String description,
@@ -14,6 +16,8 @@ public record TaskDto(
 
         TaskPriority priority,
 
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+
+        long assigneeId
 ) {
 }

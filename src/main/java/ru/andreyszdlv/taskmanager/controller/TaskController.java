@@ -12,13 +12,25 @@ import ru.andreyszdlv.taskmanager.service.TaskService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping("/api/admin/tasks")
 @RequiredArgsConstructor
 public class TaskController {
 
     private final TaskService taskService;
 
-    @PostMapping("/create")
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<TaskDto> getAllTasks(){
+        return taskService.getAllTasks();
+    }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public TaskDto getTaskById(@PathVariable long id){
+        return taskService.getTaskById(id);
+    }
+
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateTaskResponseDto createTask(
             @Valid @RequestBody CreateTaskRequestDto createTaskRequestDto,
@@ -32,10 +44,10 @@ public class TaskController {
         return taskService.createTask(createTaskRequestDto);
     }
 
-    @PutMapping("/{taskId}")
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UpdateTaskResponseDto updateTask(
-            @PathVariable long taskId,
+            @PathVariable long id,
             @Valid @RequestBody UpdateTaskRequestDto updateTaskRequestDto,
             BindingResult bindingResult
     ) throws BindException {
@@ -44,13 +56,13 @@ public class TaskController {
             throw new BindException(bindingResult);
         }
 
-        return taskService.updateTask(taskId, updateTaskRequestDto);
+        return taskService.updateTask(id, updateTaskRequestDto);
     }
 
-    @PatchMapping("/{taskId}")
+    @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UpdateTaskPartialResponseDto updateTaskPartial(
-            @PathVariable long taskId,
+            @PathVariable long id,
             @Valid @RequestBody UpdateTaskPartialRequestDto updateTaskPartialRequestDto,
             BindingResult bindingResult
     ) throws BindException {
@@ -59,20 +71,12 @@ public class TaskController {
             throw new BindException(bindingResult);
         }
 
-        return taskService.updateTaskPartial(taskId, updateTaskPartialRequestDto);
+        return taskService.updateTaskPartial(id, updateTaskPartialRequestDto);
     }
 
-    @DeleteMapping("/{taskId}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTask(@PathVariable long taskId) {
-        taskService.deleteTask(taskId);
+    public void deleteTask(@PathVariable long id) {
+        taskService.deleteTask(id);
     }
-
-
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<TaskDto> getAllTasks(){
-        return taskService.getAllTasks();
-    }
-
 }

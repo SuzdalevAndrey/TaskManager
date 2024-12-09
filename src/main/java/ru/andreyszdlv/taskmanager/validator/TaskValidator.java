@@ -4,11 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.exception.AnotherUserAssigneeTaskException;
-import ru.andreyszdlv.taskmanager.exception.AnotherUserCreateTaskException;
 import ru.andreyszdlv.taskmanager.exception.TaskNotFoundException;
 import ru.andreyszdlv.taskmanager.model.Task;
 import ru.andreyszdlv.taskmanager.repository.TaskRepository;
-import ru.andreyszdlv.taskmanager.repository.UserRepository;
 import ru.andreyszdlv.taskmanager.service.SecurityContextService;
 
 @Component
@@ -16,8 +14,6 @@ import ru.andreyszdlv.taskmanager.service.SecurityContextService;
 public class TaskValidator {
 
     private final TaskRepository taskRepository;
-
-    private final UserRepository userRepository;
 
     private final SecurityContextService securityContextService;
 
@@ -34,5 +30,4 @@ public class TaskValidator {
             throw new AnotherUserAssigneeTaskException("error.409.task.assignee.another_user");
         }
     }
-
 }

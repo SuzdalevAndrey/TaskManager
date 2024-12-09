@@ -6,6 +6,8 @@ import ru.andreyszdlv.taskmanager.enums.TaskStatus;
 import java.time.LocalDateTime;
 
 public record UpdateTaskPartialResponseDto(
+        long id,
+
         String title,
 
         String description,
@@ -14,6 +16,8 @@ public record UpdateTaskPartialResponseDto(
 
         TaskPriority priority,
 
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+
+        long assigneeId
 ) {
 }

@@ -32,7 +32,7 @@ public class Task {
     @Column(name = "c_priority", nullable = false)
     private TaskPriority priority;
 
-    @Column(name = "c_created_at", nullable = false)
+    @Column(name = "c_created_at", nullable = false, columnDefinition = "TIMESTAMP(0)")
     private LocalDateTime createdAt;
 
     @ManyToOne

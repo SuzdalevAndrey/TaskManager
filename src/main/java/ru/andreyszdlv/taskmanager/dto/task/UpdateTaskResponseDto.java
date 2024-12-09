@@ -6,6 +6,8 @@ import ru.andreyszdlv.taskmanager.enums.TaskStatus;
 import java.time.LocalDateTime;
 
 public record UpdateTaskResponseDto(
+        long id,
+
         String title,
 
         String description,
