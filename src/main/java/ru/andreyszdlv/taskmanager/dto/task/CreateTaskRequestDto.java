@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import ru.andreyszdlv.taskmanager.enums.TaskPriority;
 import ru.andreyszdlv.taskmanager.enums.TaskStatus;
 import ru.andreyszdlv.taskmanager.validation.NotBlankIfPresent;
+import ru.andreyszdlv.taskmanager.validation.ValueOfEnum;
 
 public record CreateTaskRequestDto(
 
@@ -19,10 +20,12 @@ public record CreateTaskRequestDto(
         String description,
 
         @NotNull(message = "{validation.error.task.priority.is_empty}")
-        TaskPriority priority,
+        @ValueOfEnum(enumClass = TaskPriority.class, message = "{validation.error.task.priority.invalid}")
+        String priority,
 
         @NotNull(message = "{validation.error.task.status.is_empty}")
-        TaskStatus status,
+        @ValueOfEnum(enumClass = TaskStatus.class, message = "{validation.error.task.status.invalid}")
+        String status,
 
         @Min(value = 1, message = "{validation.error.task.assigneeId.invalid}")
         Long assigneeId

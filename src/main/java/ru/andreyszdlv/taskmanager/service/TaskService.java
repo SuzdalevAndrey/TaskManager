@@ -55,8 +55,10 @@ public class TaskService {
 
         Optional.ofNullable(requestDto.title()).ifPresent(task::setTitle);
         Optional.ofNullable(requestDto.description()).ifPresent(task::setDescription);
-        Optional.ofNullable(requestDto.priority()).ifPresent(task::setPriority);
-        Optional.ofNullable(requestDto.status()).ifPresent(task::setStatus);
+        Optional.ofNullable(requestDto.priority())
+                .ifPresent((priority)->task.setPriority(TaskPriority.valueOf(priority)));
+        Optional.ofNullable(requestDto.status())
+                .ifPresent((status)->task.setStatus(TaskStatus.valueOf(status)));
 
         if(requestDto.assigneeId() != null) {
             User assignee = userService.getUserOrElseThrow(requestDto.assigneeId());

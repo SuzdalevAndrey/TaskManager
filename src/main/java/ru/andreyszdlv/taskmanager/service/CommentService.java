@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.dto.comment.CommentDto;
 import ru.andreyszdlv.taskmanager.dto.comment.CreateCommentRequestDto;
-import ru.andreyszdlv.taskmanager.enums.Role;
 import ru.andreyszdlv.taskmanager.exception.CommentNotFoundException;
 import ru.andreyszdlv.taskmanager.mapper.CommentMapper;
 import ru.andreyszdlv.taskmanager.model.Comment;
