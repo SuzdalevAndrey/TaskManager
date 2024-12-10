@@ -11,8 +11,6 @@ import ru.andreyszdlv.taskmanager.dto.comment.CommentDto;
 import ru.andreyszdlv.taskmanager.dto.comment.CreateCommentRequestDto;
 import ru.andreyszdlv.taskmanager.service.CommentService;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/tasks")
@@ -39,10 +37,5 @@ public class CommentController {
     public ResponseEntity<Void> deleteComment(@PathVariable long commentId) {
         commentService.deleteComment(commentId);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/{taskId}/comments")
-    public ResponseEntity<List<CommentDto>> getAllCommentsTaskByTaskId(@PathVariable long taskId) {
-        return ResponseEntity.ok(commentService.getAllCommentsTaskByTaskId(taskId));
     }
 }

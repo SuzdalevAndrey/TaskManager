@@ -1,9 +1,12 @@
 package ru.andreyszdlv.taskmanager.service;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.dto.task.*;
+import ru.andreyszdlv.taskmanager.enums.TaskPriority;
+import ru.andreyszdlv.taskmanager.enums.TaskStatus;
 import ru.andreyszdlv.taskmanager.exception.TaskNotFoundException;
 import ru.andreyszdlv.taskmanager.mapper.TaskMapper;
 import ru.andreyszdlv.taskmanager.model.Task;
@@ -64,6 +67,33 @@ public class TaskService {
     }
 
     @Transactional
+    public TaskDto updateStatus(long id, UpdateStatusRequestDto requestDto) {
+        Task task = getTaskByIdOrElseThrow(id);
+
+        task.setStatus(TaskStatus.valueOf(requestDto.status()));
+
+        return taskMapper.toTaskDto(task);
+    }
+
+    @Transactional
+    public TaskDto updatePriority(long id, UpdatePriorityRequestDto requestDto) {
+        Task task = getTaskByIdOrElseThrow(id);
+
+        task.setPriority(TaskPriority.valueOf(requestDto.priority()));
+
+        return taskMapper.toTaskDto(task);
+    }
+
+    @Transactional
+    public TaskDto updateAssignee(long id, UpdateAssigneeRequestDto requestDto) {
+        Task task = getTaskByIdOrElseThrow(id);
+
+        task.setAssignee(userService.getUserOrElseThrow(requestDto.assigneeId()));
+
+        return taskMapper.toTaskDto(task);
+    }
+
+    @Transactional
     public void deleteTask(long taskId) {
         this.checkTaskExists(taskId);
 
@@ -88,8 +118,7 @@ public class TaskService {
                 );
     }
 
-    @Transactional(readOnly = true)
-    public void checkTaskExists(long taskId) {
+    private void checkTaskExists(long taskId) {
         if(!taskRepository.existsById(taskId)) {
             throw new TaskNotFoundException("error.404.task.not_found");
         }

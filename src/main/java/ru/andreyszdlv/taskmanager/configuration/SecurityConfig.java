@@ -3,6 +3,7 @@ package ru.andreyszdlv.taskmanager.configuration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -52,8 +53,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/api/auth/logout").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/admin/tasks/**").hasAuthority("ADMIN")
-                        .requestMatchers("/api/tasks/**").hasAuthority("USER")
+                        .requestMatchers("/api/tasks/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

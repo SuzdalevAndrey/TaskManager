@@ -13,7 +13,7 @@ import ru.andreyszdlv.taskmanager.service.TaskService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/tasks")
+@RequestMapping("/api/tasks")
 @RequiredArgsConstructor
 public class TaskController {
 
@@ -56,6 +56,46 @@ public class TaskController {
         }
 
         return ResponseEntity.ok(taskService.updateTaskPartial(id, updateTaskPartialRequestDto));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<TaskDto> updateStatusTask(
+            @PathVariable long id,
+            @Valid @RequestBody UpdateStatusRequestDto updateStatusRequestDto,
+            BindingResult bindingResult
+    ) throws BindException {
+        if(bindingResult.hasErrors()) {
+            throw new BindException(bindingResult);
+        }
+        return ResponseEntity.ok(taskService.updateStatus(id, updateStatusRequestDto));
+    }
+
+    @PatchMapping("/{id}/priority")
+    public ResponseEntity<TaskDto> updatePriorityTask(
+            @PathVariable long id,
+            @Valid @RequestBody UpdatePriorityRequestDto updatePriorityRequestDto,
+            BindingResult bindingResult
+    ) throws BindException {
+
+        if(bindingResult.hasErrors()) {
+            throw new BindException(bindingResult);
+        }
+
+        return ResponseEntity.ok(taskService.updatePriority(id, updatePriorityRequestDto));
+    }
+
+    @PatchMapping("/{id}/assignee")
+    public ResponseEntity<TaskDto> addAssigneeForTask(
+            @PathVariable long id,
+            @Valid @RequestBody UpdateAssigneeRequestDto updateAssigneeRequestDto,
+            BindingResult bindingResult
+    ) throws BindException{
+
+        if(bindingResult.hasErrors()) {
+            throw new BindException(bindingResult);
+        }
+
+        return ResponseEntity.ok(taskService.updateAssignee(id, updateAssigneeRequestDto));
     }
 
     @DeleteMapping("/{id}")

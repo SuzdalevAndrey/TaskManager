@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -44,6 +45,18 @@ public class GlobalControllerAdvice {
         response.setProperty(
                 "errors",
                 ex.getAllErrors().stream().map(ObjectError::getDefaultMessage).toList()
+        );
+
+        log.error("handleBadRequestException: {}", response);
+
+        return response;
+    }
+
+    @ExceptionHandler({HttpMessageNotReadableException.class})
+    public ProblemDetail handleBadRequestException(HttpMessageNotReadableException ex, Locale locale) {
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
         );
 
         log.error("handleBadRequestException: {}", response);

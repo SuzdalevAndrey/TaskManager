@@ -14,7 +14,6 @@ import ru.andreyszdlv.taskmanager.repository.CommentRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,11 +34,6 @@ public class CommentService {
 
         Task task = taskService.getTaskByIdOrElseThrow(taskId);
 
-        if(securityContextService.getCurrentUserRole() == Role.USER
-                && !task.getAssignee().getEmail().equals(securityContextService.getCurrentUserName())) {
-            throw new RuntimeException();
-        }
-
         Comment comment = commentMapper.toComment(requestDto);
         comment.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         comment.setAuthor(userService.getUserOrElseThrow(securityContextService.getCurrentUserName()));
@@ -52,28 +46,11 @@ public class CommentService {
     public void deleteComment(long commentId) {
         Comment comment = this.getCommentByIdOrElseThrow(commentId);
 
-        if(securityContextService.getCurrentUserRole() == Role.USER
-                && !comment.getAuthor().getEmail().equals(securityContextService.getCurrentUserName())) {
-            throw new RuntimeException();
-        }
-
         commentRepository.deleteById(commentId);
     }
 
     @Transactional(readOnly = true)
-    public List<CommentDto> getAllCommentsTaskByTaskId(long taskId) {
-        Task task = taskService.getTaskByIdOrElseThrow(taskId);
-
-        if(securityContextService.getCurrentUserRole() == Role.USER
-                && !task.getAssignee().getEmail().equals(securityContextService.getCurrentUserName())) {
-            throw new RuntimeException();
-        }
-
-        return task.getComments().stream().map(commentMapper::toCommentDto).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public Comment getCommentByIdOrElseThrow(Long commentId) {
+    public Comment getCommentByIdOrElseThrow(long commentId) {
         return commentRepository.findById(commentId).orElseThrow(
                 ()->new CommentNotFoundException("error.404.comment.not_found")
         );
