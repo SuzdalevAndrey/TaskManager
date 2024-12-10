@@ -34,9 +34,6 @@ class AuthServiceTest {
     UserMapper userMapper;
 
     @Mock
-    PasswordEncoder passwordEncoder;
-
-    @Mock
     AuthenticationManager authenticationManager;
 
     @Mock
@@ -49,7 +46,7 @@ class AuthServiceTest {
     JwtValidator jwtValidator;
 
     @Mock
-    SecurityContextService securityContextService;
+    PasswordEncoder passwordEncoder;
 
     @InjectMocks
     AuthService authService;
@@ -175,7 +172,7 @@ class AuthServiceTest {
     @Test
     void logout_Success_WhenUserAuthenticated() {
         String email = "test@test.ru";
-        when(securityContextService.getCurrentUserName()).thenReturn(email);
+        when(userService.getCurrentUserEmail()).thenReturn(email);
 
         authService.logout();
 
@@ -184,7 +181,7 @@ class AuthServiceTest {
 
     @Test
     void logout_ThrowsException_WhenUserUnauthenticated() {
-        when(securityContextService.getCurrentUserName()).thenThrow(UserUnauthenticatedException.class);
+        when(userService.getCurrentUserEmail()).thenThrow(UserUnauthenticatedException.class);
 
         assertThrows(
                 UserUnauthenticatedException.class,

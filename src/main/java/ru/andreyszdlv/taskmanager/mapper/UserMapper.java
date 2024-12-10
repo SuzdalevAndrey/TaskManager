@@ -1,6 +1,7 @@
 package ru.andreyszdlv.taskmanager.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import ru.andreyszdlv.taskmanager.dto.auth.RegisterUserRequestDto;
 import ru.andreyszdlv.taskmanager.dto.auth.RegisterUserResponseDto;
@@ -11,6 +12,6 @@ public interface UserMapper {
 
     RegisterUserResponseDto toRegisterUserResponseDto(User user);
 
+    @Mapping(target = "password", ignore = true)
     User toUser(RegisterUserRequestDto registerUserRequestDto);
-
 }

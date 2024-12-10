@@ -38,8 +38,6 @@ public class AuthService {
 
     private final JwtValidator jwtValidator;
 
-    private final SecurityContextService securityContextService;
-
     @Transactional
     public RegisterUserResponseDto registerUser(RegisterUserRequestDto registerUserRequestDto) {
         log.info("Registering new user with email: {}", registerUserRequestDto.email());
@@ -96,7 +94,7 @@ public class AuthService {
     }
 
     public void logout() {
-        String userEmail = securityContextService.getCurrentUserName();
+        String userEmail = userService.getCurrentUserEmail();
 
         log.info("User with email {} logout successfully", userEmail);
         jwtStorageService.deleteByUserEmail(userEmail);

@@ -15,5 +15,7 @@ public class RequestValidator {
             log.error("Validation failed: {}", bindingResult.getAllErrors());
             throw new BindException(bindingResult);
         }
+
+        log.info("Validation successful");
     }
 }

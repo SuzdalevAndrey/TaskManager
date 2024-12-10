@@ -1,4 +1,4 @@
-package ru.andreyszdlv.taskmanager.validator;
+package ru.andreyszdlv.taskmanager.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,12 +7,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import ru.andreyszdlv.taskmanager.exception.UserAlreadyExsitsException;
 import ru.andreyszdlv.taskmanager.repository.UserRepository;
-import ru.andreyszdlv.taskmanager.service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class UserValidatorTest {
+class UserServiceTest {
 
     @Mock
     UserRepository userRepository;

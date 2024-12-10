@@ -1,7 +1,7 @@
 package ru.andreyszdlv.taskmanager.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.dto.task.*;
@@ -18,13 +18,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskService {
 
     private final TaskRepository taskRepository;
-
-    private final SecurityContextService securityContextService;
 
     private final TaskMapper taskMapper;
 
@@ -32,17 +31,23 @@ public class TaskService {
 
     @Transactional
     public TaskDto createTask(CreateTaskRequestDto requestDto){
+        log.info("Creating new task with title: {}", requestDto.title());
 
         Task task = taskMapper.toTask(requestDto);
+        log.info("Mapped CreateTaskRequestDto to Task entity");
         task.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        task.setAuthor(userService.getUserOrElseThrow(securityContextService.getCurrentUserName()));
+        task.setAuthor(userService.getCurrentUser());
 
         if(requestDto.assigneeId() != null) {
-            User assignee = userService.getUserOrElseThrow(requestDto.assigneeId());
+            User assignee = userService.getUserByIdOrElseThrow(requestDto.assigneeId());
             task.setAssignee(assignee);
+            log.info("Task assigned to user: {}", assignee.getEmail());
         }
 
-        return taskMapper.toTaskDto(taskRepository.save(task));
+        Task savedTask = taskRepository.save(task);
+        log.info("Task with id: {} successfully created", savedTask.getId());
+
+        return taskMapper.toTaskDto(savedTask);
     }
 
     @Transactional
@@ -50,6 +55,7 @@ public class TaskService {
             long taskId,
             UpdateTaskPartialRequestDto requestDto
     ) {
+        log.info("Updating task with id: {}", taskId);
 
         Task task = this.getTaskByIdOrElseThrow(taskId);
 
@@ -61,45 +67,60 @@ public class TaskService {
                 .ifPresent((status)->task.setStatus(TaskStatus.valueOf(status)));
 
         if(requestDto.assigneeId() != null) {
-            User assignee = userService.getUserOrElseThrow(requestDto.assigneeId());
+            User assignee = userService.getUserByIdOrElseThrow(requestDto.assigneeId());
             task.setAssignee(assignee);
+            log.info("Task reassigned to user: {}", assignee.getEmail());
         }
 
+        log.info("Task with id: {} successfully updated", taskId);
         return taskMapper.toTaskDto(task);
     }
 
     @Transactional
     public TaskDto updateStatus(long id, UpdateStatusRequestDto requestDto) {
+        log.info("Updating status task with id: {}", id);
+
         Task task = getTaskByIdOrElseThrow(id);
 
         task.setStatus(TaskStatus.valueOf(requestDto.status()));
 
+        log.info("Task status updated");
         return taskMapper.toTaskDto(task);
     }
 
     @Transactional
     public TaskDto updatePriority(long id, UpdatePriorityRequestDto requestDto) {
+        log.info("Updating priority task with id: {}", id);
+
         Task task = getTaskByIdOrElseThrow(id);
 
         task.setPriority(TaskPriority.valueOf(requestDto.priority()));
 
+        log.info("Task priority updated");
         return taskMapper.toTaskDto(task);
     }
 
     @Transactional
     public TaskDto updateAssignee(long id, UpdateAssigneeRequestDto requestDto) {
+        log.info("Updating assignee for task with id: {}", id);
+
         Task task = getTaskByIdOrElseThrow(id);
 
-        task.setAssignee(userService.getUserOrElseThrow(requestDto.assigneeId()));
+        task.setAssignee(userService.getUserByIdOrElseThrow(requestDto.assigneeId()));
 
+        log.info("Task assignee updated");
         return taskMapper.toTaskDto(task);
     }
 
     @Transactional
     public void deleteTask(long taskId) {
+        log.info("Deleting task with id: {}", taskId);
+
         this.checkTaskExists(taskId);
 
         taskRepository.deleteById(taskId);
+
+        log.info("Task with id: {} successfully deleted", taskId);
     }
 
     @Transactional(readOnly = true)
@@ -114,15 +135,27 @@ public class TaskService {
 
     @Transactional(readOnly = true)
     public Task getTaskByIdOrElseThrow(long taskId) {
-        return taskRepository.findById(taskId)
-                .orElseThrow(
-                        () -> new TaskNotFoundException("error.404.task.not_found")
-                );
+        log.info("Getting task by id: {}", taskId);
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> {
+                    log.error("Task not found with id: {}", taskId);
+                    return new TaskNotFoundException("error.404.task.not_found");
+                });
+
+        log.info("Task get successfully. Task id: {}",
+                task.getId());
+        return task;
     }
 
     private void checkTaskExists(long taskId) {
+        log.info("Checking if task with id: {} exists", taskId);
+
         if(!taskRepository.existsById(taskId)) {
+            log.error("Task with id: {} not exist", taskId);
             throw new TaskNotFoundException("error.404.task.not_found");
         }
+
+        log.info("Task with id: {} exists", taskId);
     }
 }
