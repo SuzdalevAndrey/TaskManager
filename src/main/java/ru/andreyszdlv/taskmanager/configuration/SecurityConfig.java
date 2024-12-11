@@ -53,6 +53,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/api/auth/logout").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/tasks/{taskId}/comments/").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/tasks/{id}/status").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/tasks").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/tasks/{id}").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers("/api/tasks/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
