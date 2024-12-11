@@ -20,7 +20,7 @@ public record TaskDto(
 
         LocalDateTime createdAt,
 
-        long assigneeId,
+        Long assigneeId,
 
         List<CommentDto> comments
 ) {

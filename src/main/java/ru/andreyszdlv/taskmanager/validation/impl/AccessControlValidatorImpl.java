@@ -17,14 +17,26 @@ public class AccessControlValidatorImpl implements AccessControlValidator {
     private final UserService userService;
 
     public boolean validateAccessTask(Task task) {
+        String email = userService.getCurrentUserEmail();
+
+        log.info("Validating access for taskId: {} and user email: {}",
+                task.getId(),
+                email
+        );
         return userService.getCurrentUserRole() == Role.ADMIN
                 || (userService.getCurrentUserRole() == Role.USER
-                && task.getAssignee().getEmail().equals(userService.getCurrentUserEmail()));
+                && task.getAssignee().getEmail().equals(email));
     }
 
     public boolean validateAccessComment(Comment comment) {
+        String email = userService.getCurrentUserEmail();
+
+        log.info("Validating access for commentId: {} and user email: {}",
+                comment.getId(),
+                email
+        );
         return userService.getCurrentUserRole() == Role.ADMIN
                 || (userService.getCurrentUserRole() == Role.USER
-                && comment.getAuthor().getEmail().equals(userService.getCurrentUserEmail()));
+                && comment.getAuthor().getEmail().equals(email));
     }
 }

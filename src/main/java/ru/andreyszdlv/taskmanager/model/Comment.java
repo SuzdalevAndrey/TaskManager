@@ -16,10 +16,10 @@ public class Comment {
     @Column(name = "c_id")
     private Long id;
 
-    @Column(name = "c_content", nullable = false)
+    @Column(name = "c_content", nullable = false, length = 1000)
     private String content;
 
-    @Column(name = "c_created_at", nullable = false)
+    @Column(name = "c_created_at", nullable = false, columnDefinition = "TIMESTAMP(0)", updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne

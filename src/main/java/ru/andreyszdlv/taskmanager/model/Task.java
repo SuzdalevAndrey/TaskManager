@@ -18,25 +18,25 @@ public class Task {
     @Column(name = "c_id")
     private Long id;
 
-    @Column(name = "c_title", nullable = false)
+    @Column(name = "c_title", nullable = false, length = 255)
     private String title;
 
-    @Column(name = "c_description")
+    @Column(name = "c_description", length = 1000)
     private String description;
 
+    @Column(name = "c_status", nullable = false, columnDefinition = "VARCHAR(20) CHECK (c_status IN ('OPEN', 'IN_PROGRESS', 'DONE'))")
     @Enumerated(EnumType.STRING)
-    @Column(name = "c_status", nullable = false)
     private TaskStatus status;
 
+    @Column(name = "c_priority", nullable = false, columnDefinition = "VARCHAR(20) CHECK (c_priority IN ('LOW', 'MEDIUM', 'HIGH'))")
     @Enumerated(EnumType.STRING)
-    @Column(name = "c_priority", nullable = false)
     private TaskPriority priority;
 
-    @Column(name = "c_created_at", nullable = false, columnDefinition = "TIMESTAMP(0)")
+    @Column(name = "c_created_at", nullable = false, columnDefinition = "TIMESTAMP(0)", updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "c_author_id", nullable = false)
+    @JoinColumn(name = "c_author_id", nullable = false, updatable = false)
     private User author;
 
     @ManyToOne

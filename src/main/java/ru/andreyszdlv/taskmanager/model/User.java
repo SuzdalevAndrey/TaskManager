@@ -25,16 +25,17 @@ public class User implements UserDetails {
     @Column(name = "c_id")
     private Long id;
 
-    @Column(nullable = false, name = "c_name")
+    @Column(name = "c_name", length = 50, nullable = false)
     private String name;
 
-    @Column(nullable = false, name = "c_email")
+    @Column(name = "c_email", nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, name = "c_password")
+    @Column(name = "c_password", length = 100, nullable = false)
     private String password;
 
     @Column(nullable = false, name = "c_role")
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
