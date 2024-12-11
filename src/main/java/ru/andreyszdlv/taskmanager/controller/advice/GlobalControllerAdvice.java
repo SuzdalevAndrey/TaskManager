@@ -80,4 +80,18 @@ public class GlobalControllerAdvice {
 
         return response;
     }
+
+    @ExceptionHandler({
+            AccessDeniedException.class
+    })
+    public ProblemDetail handleForbiddenException(RuntimeException ex, Locale locale) {
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(
+                HttpStatus.FORBIDDEN,
+                messageSource.getMessage(ex.getMessage(), null, ex.getMessage(), locale)
+        );
+
+        log.error("handleForbiddenException: {}", response);
+
+        return response;
+    }
 }

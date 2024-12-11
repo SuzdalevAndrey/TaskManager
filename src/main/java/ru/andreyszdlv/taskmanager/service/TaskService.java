@@ -7,11 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.dto.task.*;
 import ru.andreyszdlv.taskmanager.enums.TaskPriority;
 import ru.andreyszdlv.taskmanager.enums.TaskStatus;
+import ru.andreyszdlv.taskmanager.exception.AccessDeniedException;
 import ru.andreyszdlv.taskmanager.exception.TaskNotFoundException;
 import ru.andreyszdlv.taskmanager.mapper.TaskMapper;
 import ru.andreyszdlv.taskmanager.model.Task;
 import ru.andreyszdlv.taskmanager.model.User;
 import ru.andreyszdlv.taskmanager.repository.TaskRepository;
+import ru.andreyszdlv.taskmanager.validation.AccessControlValidator;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -28,6 +30,8 @@ public class TaskService {
     private final TaskMapper taskMapper;
 
     private final UserService userService;
+
+    private final AccessControlValidator accessControlValidator;
 
     @Transactional
     public TaskDto createTask(CreateTaskRequestDto requestDto){
@@ -82,6 +86,9 @@ public class TaskService {
 
         Task task = getTaskByIdOrElseThrow(id);
 
+        if(!accessControlValidator.validateAccessTask(task))
+            throw new AccessDeniedException("error.403.access.denied");
+
         task.setStatus(TaskStatus.valueOf(requestDto.status()));
 
         log.info("Task status updated");
@@ -125,12 +132,18 @@ public class TaskService {
 
     @Transactional(readOnly = true)
     public TaskDto getTaskById(long taskId) {
-        return taskMapper.toTaskDto(this.getTaskByIdOrElseThrow(taskId));
+
+        Task task = this.getTaskByIdOrElseThrow(taskId);
+
+        if(!accessControlValidator.validateAccessTask(task))
+            throw new AccessDeniedException("error.403.access.denied");
+
+        return taskMapper.toTaskDto(task);
     }
 
     @Transactional(readOnly = true)
     public List<TaskDto> getAllTasks() {
-        return taskRepository.findAll().stream().map(taskMapper::toTaskDto).toList();
+        return taskRepository.findAll().stream().filter(accessControlValidator::validateAccessTask).map(taskMapper::toTaskDto).toList();
     }
 
     @Transactional(readOnly = true)

@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.dto.comment.CommentDto;
 import ru.andreyszdlv.taskmanager.dto.comment.CreateCommentRequestDto;
+import ru.andreyszdlv.taskmanager.exception.AccessDeniedException;
 import ru.andreyszdlv.taskmanager.exception.CommentNotFoundException;
 import ru.andreyszdlv.taskmanager.mapper.CommentMapper;
 import ru.andreyszdlv.taskmanager.model.Comment;
 import ru.andreyszdlv.taskmanager.model.Task;
 import ru.andreyszdlv.taskmanager.repository.CommentRepository;
+import ru.andreyszdlv.taskmanager.validation.AccessControlValidator;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -28,11 +30,16 @@ public class CommentService {
 
     private final UserService userService;
 
+    private final AccessControlValidator accessControlValidator;
+
     @Transactional
     public CommentDto createComment(long taskId, CreateCommentRequestDto requestDto) {
         log.info("Creating comment for task: {}", taskId);
 
         Task task = taskService.getTaskByIdOrElseThrow(taskId);
+
+        if(!accessControlValidator.validateAccessTask(task))
+            throw new AccessDeniedException("error.403.access.denied");
 
         Comment comment = commentMapper.toComment(requestDto);
         log.info("Mapped CreateCommentRequestDto to Comment entity");
@@ -51,6 +58,10 @@ public class CommentService {
     public void deleteComment(long commentId) {
         log.info("Deleting comment with id: {}", commentId);
         Comment comment = this.getCommentByIdOrElseThrow(commentId);
+
+        if(!accessControlValidator.validateAccessComment(comment))
+            throw new AccessDeniedException("error.403.access.denied");
+
 
         commentRepository.deleteById(commentId);
         log.info("Comment with id: {} deleted successfully", commentId);
