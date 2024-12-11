@@ -18,10 +18,6 @@ public record RegisterUserRequestDto(
 
         @NotBlank(message = "{validation.error.user.password.is_empty}")
         @Size(min = 6, max = 100, message = "{validation.error.user.password.size.invalid}")
-        @Pattern(
-                regexp = "^(?=.*[a-zA-Zа-яА-Я])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-zА-Яа-я\\d@$!%*?&]{6,}$",
-                message = "{validation.error.user.password.invalid}"
-        )
         String password
 ) {
 }

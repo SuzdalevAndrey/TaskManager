@@ -18,13 +18,13 @@ public class Task {
     @Column(name = "c_id")
     private Long id;
 
-    @Column(name = "c_title", nullable = false, length = 255)
+    @Column(name = "c_title", nullable = false)
     private String title;
 
     @Column(name = "c_description", length = 1000)
     private String description;
 
-    @Column(name = "c_status", nullable = false, columnDefinition = "VARCHAR(20) CHECK (c_status IN ('OPEN', 'IN_PROGRESS', 'DONE'))")
+    @Column(name = "c_status", nullable = false, columnDefinition = "VARCHAR(20) CHECK (c_status IN ('WAITING', 'IN_PROGRESS', 'COMPLETED'))")
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
