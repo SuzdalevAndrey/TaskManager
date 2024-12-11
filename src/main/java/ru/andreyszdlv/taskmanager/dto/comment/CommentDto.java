@@ -7,6 +7,8 @@ public record CommentDto(
 
         String content,
 
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+
+        long authorId
 ) {
 }
