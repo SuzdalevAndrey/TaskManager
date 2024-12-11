@@ -108,7 +108,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}/assignee")
-    public ResponseEntity<TaskDto> addAssigneeForTask(
+    public ResponseEntity<TaskDto> updateAssigneeTask(
             @PathVariable long id,
             @Valid @RequestBody UpdateAssigneeRequestDto updateAssigneeRequestDto,
             BindingResult bindingResult

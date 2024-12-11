@@ -74,6 +74,8 @@ class AuthControllerIT extends BaseIT{
     @Autowired
     MockMvc mockMvc;
 
+    String BASE_URL="/api/auth";
+
     @Test
     @Transactional
     void registerUser_Returns201_WhenDataValidAndUserNoExists() throws Exception {
@@ -82,7 +84,7 @@ class AuthControllerIT extends BaseIT{
         String password = "password";
         RegisterUserRequestDto requestDto = new RegisterUserRequestDto(name, email, password);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .post("/api/auth/register")
+                .post(BASE_URL+"/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto));
 
@@ -111,7 +113,7 @@ class AuthControllerIT extends BaseIT{
         String password = "0000";
         RegisterUserRequestDto requestDto = new RegisterUserRequestDto(name, email, password);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .post("/api/auth/register")
+                .post(BASE_URL+"/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto));
 
@@ -139,7 +141,7 @@ class AuthControllerIT extends BaseIT{
         long userId = userRepository.save(user).getId();
         RegisterUserRequestDto requestDto = new RegisterUserRequestDto(name, email, password);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .post("/api/auth/register")
+                .post(BASE_URL+"/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto));
 
@@ -171,7 +173,7 @@ class AuthControllerIT extends BaseIT{
         userRepository.save(user);
         LoginRequestDto requestDto = new LoginRequestDto(email, password);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .post("/api/auth/login")
+                .post(BASE_URL+"/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto));
 
@@ -195,7 +197,7 @@ class AuthControllerIT extends BaseIT{
         String password = "0000";
         LoginRequestDto requestDto = new LoginRequestDto(email, password);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .post("/api/auth/login")
+                .post(BASE_URL+"/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto));
 
@@ -213,7 +215,7 @@ class AuthControllerIT extends BaseIT{
         String password = "000000";
         LoginRequestDto requestDto = new LoginRequestDto(email, password);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .post("/api/auth/login")
+                .post(BASE_URL+"/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto));
 
@@ -241,7 +243,7 @@ class AuthControllerIT extends BaseIT{
         userRepository.save(user);
         LoginRequestDto requestDto = new LoginRequestDto(email, passwordRequest);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .post("/api/auth/login")
+                .post(BASE_URL+"/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto));
 
@@ -261,7 +263,7 @@ class AuthControllerIT extends BaseIT{
         String accessToken = jwtStorageService.generateAccessToken(email, role);
         RefreshTokenRequestDto requestDto = new RefreshTokenRequestDto(refreshToken);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .post("/api/auth/refresh")
+                .post(BASE_URL+"/refresh")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto));
 
@@ -287,7 +289,7 @@ class AuthControllerIT extends BaseIT{
         String refreshToken = "";
         RefreshTokenRequestDto requestDto = new RefreshTokenRequestDto(refreshToken);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .post("/api/auth/refresh")
+                .post(BASE_URL+"/refresh")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto));
 
@@ -308,7 +310,7 @@ class AuthControllerIT extends BaseIT{
         String invalidRefreshToken = jwtGenerateService.generateRefreshToken(email, role);
         RefreshTokenRequestDto requestDto = new RefreshTokenRequestDto(invalidRefreshToken);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .post("/api/auth/refresh")
+                .post(BASE_URL+"/refresh")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto));
 
@@ -330,7 +332,7 @@ class AuthControllerIT extends BaseIT{
         String accessToken = jwtStorageService.generateAccessToken(email, role);
         jwtStorageService.generateRefreshToken(email, role);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .post("/api/auth/logout")
+                .post(BASE_URL+"/logout")
                 .header("Authorization", "Bearer " + accessToken);
 
         mockMvc.perform(request)
@@ -350,7 +352,7 @@ class AuthControllerIT extends BaseIT{
         String invalidAccessToken = jwtGenerateService.generateAccessToken(email, role);
         String refreshToken = jwtStorageService.generateRefreshToken(email, role);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .post("/api/auth/logout")
+                .post(BASE_URL+"/logout")
                 .header("Authorization", "Bearer " + invalidAccessToken);
 
         mockMvc.perform(request)
@@ -362,5 +364,4 @@ class AuthControllerIT extends BaseIT{
         assertEquals(validAccessToken, jwtStorageService.getAccessTokenByUserEmail(email));
         assertEquals(refreshToken, jwtStorageService.getRefreshTokenByUserEmail(email));
     }
-
 }
