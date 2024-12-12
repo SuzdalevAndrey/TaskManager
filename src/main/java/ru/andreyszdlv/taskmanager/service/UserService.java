@@ -2,9 +2,11 @@ package ru.andreyszdlv.taskmanager.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.dto.user.UserDto;
@@ -26,6 +28,14 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;
+
+    private final PasswordEncoder passwordEncoder;
+
+    @Value("${admin.email}")
+    private String emailAdmin;
+
+    @Value("${admin.password}")
+    private String passwordAdmin;
 
     @Transactional(readOnly = true)
     public void checkUserExists(String email){
@@ -115,5 +125,18 @@ public class UserService {
 
         log.error("User is unauthenticated");
         throw new UserUnauthenticatedException("error.401.user.unauthenticated");
+    }
+
+    @Transactional
+    public void createAdminIfNotExists() {
+        log.info("Creating admin if not exists");
+        this.checkUserExists(emailAdmin);
+
+        User admin = new User();
+        admin.setName("admin");
+        admin.setEmail(emailAdmin);
+        admin.setPassword(passwordEncoder.encode(passwordAdmin));
+        admin.setRole(Role.ADMIN);
+        userRepository.save(admin);
     }
 }
