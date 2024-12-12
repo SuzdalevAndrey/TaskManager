@@ -29,8 +29,8 @@ import ru.andreyszdlv.taskmanager.repository.UserRepository;
 import ru.andreyszdlv.taskmanager.service.JwtStorageService;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -78,7 +78,52 @@ public class TaskControllerForUserIT extends BaseIT{
 
     @Test
     @Transactional
-    void getAllTasks_ReturnsListTasks_WhenTaskExistsAndUserTheseTaskAssignee() throws Exception {
+    void getAllTasks_Returns403() throws Exception {
+        String emailUser = "user@user.com";
+        Role roleUser = Role.USER;
+        User user = new User();
+        user.setName("user");
+        user.setEmail(emailUser);
+        user.setRole(roleUser);
+        user.setPassword("password");
+        userRepository.save(user);
+        User author = new User();
+        author.setName("admin");
+        author.setEmail("admin@admin.com");
+        author.setRole(Role.ADMIN);
+        author.setPassword("password");
+        userRepository.save(author);
+        Task task1 = new Task();
+        task1.setTitle("Task 1");
+        task1.setDescription("Task 1");
+        task1.setStatus(TaskStatus.WAITING);
+        task1.setPriority(TaskPriority.HIGH);
+        task1.setCreatedAt(LocalDateTime.now());
+        task1.setAuthor(author);
+        task1.setAssignee(user);
+        Task savedTask1 = taskRepository.save(task1);
+        Task task2 = new Task();
+        task2.setTitle("Task 2");
+        task2.setDescription("Task 2");
+        task2.setStatus(TaskStatus.COMPLETED);
+        task2.setPriority(TaskPriority.LOW);
+        task2.setCreatedAt(LocalDateTime.now());
+        task2.setAuthor(author);
+        task2.setAssignee(user);
+        Task savedTask2 = taskRepository.save(task2);
+        String accessToken = jwtStorageService.generateAccessToken(emailUser, roleUser);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(BASE_URL)
+                .header("Authorization", "Bearer " + accessToken);
+
+        mockMvc.perform(request).andExpectAll(
+                status().isForbidden()
+        );
+    }
+
+    @Test
+    @Transactional
+    void getTasksAssigneeToMe_ReturnsListTasks_WhenTaskExistsAndUserTheseTaskAssignee() throws Exception {
         String emailAssignee = "user@user.com";
         Role roleAssignee = Role.USER;
         User assignee = new User();
@@ -112,36 +157,46 @@ public class TaskControllerForUserIT extends BaseIT{
         task2.setAssignee(assignee);
         Task savedTask2 = taskRepository.save(task2);
         String accessToken = jwtStorageService.generateAccessToken(emailAssignee, roleAssignee);
-        List<TaskDto> expectedTaskDtos = List.of(
-                taskMapper.toTaskDto(savedTask1),
-                taskMapper.toTaskDto(savedTask2)
-        );
-        String expectedJson = objectMapper.writeValueAsString(expectedTaskDtos);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .get(BASE_URL)
+                .get(BASE_URL+"/assigned-to-me")
                 .header("Authorization", "Bearer " + accessToken);
 
         mockMvc.perform(request).andExpectAll(
                 status().isOk(),
                 content().contentType(MediaType.APPLICATION_JSON),
-                content().json(expectedJson)
+                jsonPath("$.content", hasSize(2)),
+                jsonPath("$.content[0].title").value(savedTask1.getTitle()),
+                jsonPath("$.content[0].description").value(savedTask1.getDescription()),
+                jsonPath("$.content[0].status").value(savedTask1.getStatus().name()),
+                jsonPath("$.content[0].priority").value(savedTask1.getPriority().name()),
+                jsonPath("$.content[1].title").value(savedTask2.getTitle()),
+                jsonPath("$.content[1].description").value(savedTask2.getDescription()),
+                jsonPath("$.content[1].status").value(savedTask2.getStatus().name()),
+                jsonPath("$.content[1].priority").value(savedTask2.getPriority().name())
         );
     }
 
     @Test
-    void getAllTasks_ReturnsEmptyListTasks_WhenTasksNotExistWhereUserAssignee() throws Exception {
+    @Transactional
+    void getTasksAssigneeToMe_ReturnsEmptyListTasks_WhenTasksNotExistWhereUserAssignee() throws Exception {
         String emailAssignee = "user@user.com";
         Role roleAssignee = Role.USER;
+        User assignee = new User();
+        assignee.setName("user");
+        assignee.setEmail(emailAssignee);
+        assignee.setRole(roleAssignee);
+        assignee.setPassword("password");
+        userRepository.save(assignee);
         String accessToken = jwtStorageService.generateAccessToken(emailAssignee, roleAssignee);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .get(BASE_URL)
+                .get(BASE_URL+"/assigned-to-me")
                 .header("Authorization", "Bearer " + accessToken);
 
         mockMvc.perform(request).andExpectAll(
                 status().isOk(),
                 content().contentType(MediaType.APPLICATION_JSON),
                 content().json("""
-                                        []
+                                        {}
                                         """)
         );
     }

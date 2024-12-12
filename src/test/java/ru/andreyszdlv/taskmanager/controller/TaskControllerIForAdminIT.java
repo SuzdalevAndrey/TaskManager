@@ -146,6 +146,85 @@ class TaskControllerIForAdminIT extends BaseIT {
 
     @Test
     @Transactional
+    void getTasksAssigneeToMe_ReturnsListTasks_WhenTaskExistsAndUserTheseTaskAssignee() throws Exception {
+        String email = "admin@admin.com";
+        Role role = Role.ADMIN;
+        User user = new User();
+        user.setName("admin");
+        user.setEmail(email);
+        user.setRole(role);
+        user.setPassword("password");
+        userRepository.save(user);
+        Task task1 = new Task();
+        task1.setTitle("Task 1");
+        task1.setDescription("Task 1");
+        task1.setStatus(TaskStatus.WAITING);
+        task1.setPriority(TaskPriority.HIGH);
+        task1.setCreatedAt(LocalDateTime.now());
+        task1.setAuthor(user);
+        task1.setAssignee(user);
+        Task savedTask1 = taskRepository.save(task1);
+        Task task2 = new Task();
+        task2.setTitle("Task 2");
+        task2.setDescription("Task 2");
+        task2.setStatus(TaskStatus.COMPLETED);
+        task2.setPriority(TaskPriority.LOW);
+        task2.setCreatedAt(LocalDateTime.now());
+        task2.setAuthor(user);
+        task2.setAssignee(user);
+        Task savedTask2 = taskRepository.save(task2);
+        String accessToken = jwtStorageService.generateAccessToken(email, role);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(BASE_URL)
+                .header("Authorization", "Bearer " + accessToken);
+
+        mockMvc.perform(request)
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentType(MediaType.APPLICATION_JSON),
+                        jsonPath("$.content", hasSize(2)),
+                        jsonPath("$.content[0].title").value(savedTask1.getTitle()),
+                        jsonPath("$.content[0].description").value(savedTask1.getDescription()),
+                        jsonPath("$.content[0].status").value(savedTask1.getStatus().name()),
+                        jsonPath("$.content[0].priority").value(savedTask1.getPriority().name()),
+                        jsonPath("$.content[0].assigneeId").value(savedTask1.getAssignee().getId()),
+                        jsonPath("$.content[0].authorId").value(savedTask1.getAuthor().getId()),
+                        jsonPath("$.content[1].title").value(savedTask2.getTitle()),
+                        jsonPath("$.content[1].description").value(savedTask2.getDescription()),
+                        jsonPath("$.content[1].status").value(savedTask2.getStatus().name()),
+                        jsonPath("$.content[1].priority").value(savedTask2.getPriority().name()),
+                        jsonPath("$.content[1].assigneeId").value(savedTask2.getAssignee().getId()),
+                        jsonPath("$.content[1].authorId").value(savedTask2.getAuthor().getId())
+                );
+    }
+
+    @Test
+    @Transactional
+    void getTasksAssigneeToMe_ReturnsEmptyListTasks_WhenTasksNotExistWhereUserAssignee() throws Exception {
+        String email = "admin@admin.com";
+        Role role = Role.ADMIN;
+        User user = new User();
+        user.setName("admin");
+        user.setEmail(email);
+        user.setRole(role);
+        user.setPassword("password");
+        userRepository.save(user);
+        String accessToken = jwtStorageService.generateAccessToken(email, role);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(BASE_URL)
+                .header("Authorization", "Bearer " + accessToken);
+
+        mockMvc.perform(request).andExpectAll(
+                status().isOk(),
+                content().contentType(MediaType.APPLICATION_JSON),
+                content().json("""
+                                        {}
+                                        """)
+        );
+    }
+
+    @Test
+    @Transactional
     void getTaskById_ReturnsTask_WhenTaskExists() throws Exception {
         String email = "admin@admin.com";
         Role role = Role.ADMIN;
