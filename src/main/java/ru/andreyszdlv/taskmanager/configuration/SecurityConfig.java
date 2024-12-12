@@ -56,7 +56,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/tasks/*/comments").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers("/api/tasks/comments/*").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers(HttpMethod.PATCH, "/api/tasks/*/status").hasAnyAuthority("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.GET, "/api/tasks").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers(HttpMethod.GET, "/api/tasks/*").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers("/api/tasks/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/users/**").hasAuthority("ADMIN")

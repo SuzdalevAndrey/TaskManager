@@ -3,6 +3,7 @@ package ru.andreyszdlv.taskmanager.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -11,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.andreyszdlv.taskmanager.dto.task.*;
 import ru.andreyszdlv.taskmanager.service.TaskService;
 import ru.andreyszdlv.taskmanager.validation.RequestValidator;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -25,12 +24,42 @@ public class TaskController {
     private final RequestValidator requestValidator;
 
     @GetMapping
-    public ResponseEntity<List<TaskDto>> getAllTasks(){
+    public ResponseEntity<Page<TaskDto>> getAllTasks(
+            @Valid TaskFilterDto taskFilterDto,
+            BindingResult bindingResult
+    ) throws BindException {
+
         log.info("Received request get all tasks");
+        requestValidator.validateRequest(bindingResult);
 
-        List<TaskDto> tasks = taskService.getAllTasks();
+        Page<TaskDto> tasks = taskService.getAllTasks(
+                taskFilterDto.status(),
+                taskFilterDto.priority(),
+                taskFilterDto.authorId(),
+                taskFilterDto.assigneeId(),
+                taskFilterDto.page(),
+                taskFilterDto.size()
+        );
 
-        log.info("Returning {} tasks", tasks.size());
+        log.info("Returning {} tasks", tasks.getSize());
+        return ResponseEntity.ok(tasks);
+    }
+
+    @GetMapping("/assigned-to-me")
+    public ResponseEntity<Page<TaskDto>> getTasksAssigneeToMe(
+            @Valid TaskFilterForAssigneeDto taskFilterForAssigneeDto,
+            BindingResult bindingResult
+    ) throws BindException {
+
+        requestValidator.validateRequest(bindingResult);
+
+        Page<TaskDto> tasks = taskService.getAllTasksWhereUserAssignee(
+                taskFilterForAssigneeDto.status(),
+                taskFilterForAssigneeDto.priority(),
+                taskFilterForAssigneeDto.page(),
+                taskFilterForAssigneeDto.size()
+        );
+
         return ResponseEntity.ok(tasks);
     }
 

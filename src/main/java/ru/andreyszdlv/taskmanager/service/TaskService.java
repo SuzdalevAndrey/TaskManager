@@ -2,6 +2,10 @@ package ru.andreyszdlv.taskmanager.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.andreyszdlv.taskmanager.dto.task.*;
@@ -13,11 +17,11 @@ import ru.andreyszdlv.taskmanager.mapper.TaskMapper;
 import ru.andreyszdlv.taskmanager.model.Task;
 import ru.andreyszdlv.taskmanager.model.User;
 import ru.andreyszdlv.taskmanager.repository.TaskRepository;
+import ru.andreyszdlv.taskmanager.util.TaskSpecifications;
 import ru.andreyszdlv.taskmanager.validation.AccessControlValidator;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -142,8 +146,31 @@ public class TaskService {
     }
 
     @Transactional(readOnly = true)
-    public List<TaskDto> getAllTasks() {
-        return taskRepository.findAll().stream().filter(accessControlValidator::validateAccessTask).map(taskMapper::toTaskDto).toList();
+    public Page<TaskDto> getAllTasks(String status,
+                                     String priority,
+                                     Long authorId,
+                                     Long assigneeId,
+                                     int page,
+                                     int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Specification<Task> specification = Specification
+                .allOf(
+                        (status != null ? TaskSpecifications.hasStatus(TaskStatus.valueOf(status)) : null),
+                        (priority != null
+                                ? TaskSpecifications.hasPriority(TaskPriority.valueOf(priority))
+                                : null),
+                        (authorId != null ? TaskSpecifications.hasAuthor(authorId) : null),
+                        (assigneeId != null ? TaskSpecifications.hasAssignee(assigneeId) : null)
+                        );
+
+        return taskRepository.findAll(specification, pageable).map(taskMapper::toTaskDto);
+    }
+
+    @Transactional
+    public Page<TaskDto> getAllTasksWhereUserAssignee(String status, String priority, int page, int size) {
+        return getAllTasks(status, priority, null, userService.getCurrentUser().getId(), page, size);
     }
 
     @Transactional(readOnly = true)

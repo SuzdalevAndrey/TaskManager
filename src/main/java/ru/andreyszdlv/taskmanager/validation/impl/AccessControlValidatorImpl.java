@@ -26,9 +26,7 @@ public class AccessControlValidatorImpl implements AccessControlValidator {
                 email
         );
         return userService.getCurrentUserRole() == Role.ADMIN
-                || (userService.getCurrentUserRole() == Role.USER
-                && !Objects.isNull(task.getAssignee())
-                && task.getAssignee().getEmail().equals(email));
+                || (!Objects.isNull(task.getAssignee()) && task.getAssignee().getEmail().equals(email));
     }
 
     public boolean validateAccessComment(Comment comment) {
@@ -39,7 +37,6 @@ public class AccessControlValidatorImpl implements AccessControlValidator {
                 email
         );
         return userService.getCurrentUserRole() == Role.ADMIN
-                || (userService.getCurrentUserRole() == Role.USER
-                && comment.getAuthor().getEmail().equals(email));
+                || comment.getAuthor().getEmail().equals(email);
     }
 }
