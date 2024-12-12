@@ -5,6 +5,7 @@ import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -31,6 +32,7 @@ import ru.andreyszdlv.taskmanager.service.JwtStorageService;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -104,20 +106,24 @@ class TaskControllerIForAdminIT extends BaseIT {
         task2.setAuthor(user);
         Task savedTask2 = taskRepository.save(task2);
         String accessToken = jwtStorageService.generateAccessToken(email, role);
-        List<TaskDto> expectedTaskDtos = List.of(
-                taskMapper.toTaskDto(savedTask1),
-                taskMapper.toTaskDto(savedTask2)
-        );
-        String expectedJson = objectMapper.writeValueAsString(expectedTaskDtos);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .get(BASE_URL)
                 .header("Authorization", "Bearer " + accessToken);
 
-        mockMvc.perform(request).andExpectAll(
-                status().isOk(),
-                content().contentType(MediaType.APPLICATION_JSON),
-                content().json(expectedJson)
-        );
+        mockMvc.perform(request)
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentType(MediaType.APPLICATION_JSON),
+                        jsonPath("$.content", hasSize(2)),
+                        jsonPath("$.content[0].title").value(savedTask1.getTitle()),
+                        jsonPath("$.content[0].description").value(savedTask1.getDescription()),
+                        jsonPath("$.content[0].status").value(savedTask1.getStatus().name()),
+                        jsonPath("$.content[0].priority").value(savedTask1.getPriority().name()),
+                        jsonPath("$.content[1].title").value(savedTask2.getTitle()),
+                        jsonPath("$.content[1].description").value(savedTask2.getDescription()),
+                        jsonPath("$.content[1].status").value(savedTask2.getStatus().name()),
+                        jsonPath("$.content[1].priority").value(savedTask2.getPriority().name())
+                );
     }
 
     @Test
@@ -133,7 +139,7 @@ class TaskControllerIForAdminIT extends BaseIT {
                 status().isOk(),
                 content().contentType(MediaType.APPLICATION_JSON),
                 content().json("""
-                                        []
+                                        {}
                                         """)
         );
     }

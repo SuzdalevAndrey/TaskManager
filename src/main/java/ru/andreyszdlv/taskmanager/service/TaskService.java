@@ -90,8 +90,10 @@ public class TaskService {
 
         Task task = getTaskByIdOrElseThrow(id);
 
-        if(!accessControlValidator.validateAccessTask(task))
+        if(!accessControlValidator.validateAccessTask(task)){
+            log.error("This user not allowed to access task");
             throw new AccessDeniedException("error.403.access.denied");
+        }
 
         task.setStatus(TaskStatus.valueOf(requestDto.status()));
 
@@ -139,8 +141,10 @@ public class TaskService {
 
         Task task = this.getTaskByIdOrElseThrow(taskId);
 
-        if(!accessControlValidator.validateAccessTask(task))
+        if(!accessControlValidator.validateAccessTask(task)){
+            log.error("This user not allowed to access task");
             throw new AccessDeniedException("error.403.access.denied");
+        }
 
         return taskMapper.toTaskDto(task);
     }
@@ -153,19 +157,23 @@ public class TaskService {
                                      int page,
                                      int size
     ) {
+        log.info("Getting tasks with filters - status: {}, priority: {}, authorId: {}, assigneeId: {}, page: {}, size: {}",
+                status, priority, authorId, assigneeId, page, size);
+
         Pageable pageable = PageRequest.of(page, size);
 
         Specification<Task> specification = Specification
                 .allOf(
                         (status != null ? TaskSpecifications.hasStatus(TaskStatus.valueOf(status)) : null),
-                        (priority != null
-                                ? TaskSpecifications.hasPriority(TaskPriority.valueOf(priority))
-                                : null),
+                        (priority != null ? TaskSpecifications.hasPriority(TaskPriority.valueOf(priority)) : null),
                         (authorId != null ? TaskSpecifications.hasAuthor(authorId) : null),
                         (assigneeId != null ? TaskSpecifications.hasAssignee(assigneeId) : null)
-                        );
+                );
 
-        return taskRepository.findAll(specification, pageable).map(taskMapper::toTaskDto);
+        Page<TaskDto> result = taskRepository.findAll(specification, pageable).map(taskMapper::toTaskDto);
+
+        log.info("Found {} tasks matching criteria", result.getTotalElements());
+        return result;
     }
 
     @Transactional

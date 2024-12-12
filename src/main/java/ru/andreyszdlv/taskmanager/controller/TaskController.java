@@ -28,8 +28,8 @@ public class TaskController {
             @Valid TaskFilterDto taskFilterDto,
             BindingResult bindingResult
     ) throws BindException {
-
         log.info("Received request get all tasks");
+
         requestValidator.validateRequest(bindingResult);
 
         Page<TaskDto> tasks = taskService.getAllTasks(
@@ -50,6 +50,7 @@ public class TaskController {
             @Valid TaskFilterForAssigneeDto taskFilterForAssigneeDto,
             BindingResult bindingResult
     ) throws BindException {
+        log.info("Received request get tasks, where user assignee");
 
         requestValidator.validateRequest(bindingResult);
 
@@ -60,6 +61,7 @@ public class TaskController {
                 taskFilterForAssigneeDto.size()
         );
 
+        log.info("Returning {} tasks", tasks.getSize());
         return ResponseEntity.ok(tasks);
     }
 
