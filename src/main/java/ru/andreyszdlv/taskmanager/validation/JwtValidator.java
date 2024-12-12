@@ -45,7 +45,7 @@ public class JwtValidator {
 
         if(Objects.isNull(expectedRefreshToken) || !expectedRefreshToken.equals(token)) {
             log.error("Refresh token validation failed for: {}", userEmail);
-            throw new InvalidRefreshTokenException("error.409.refresh_token.invalid");
+            throw new InvalidRefreshTokenException("error.401.refresh_token.invalid");
         }
 
         log.info("Refresh token validation successful for: {}", userEmail);

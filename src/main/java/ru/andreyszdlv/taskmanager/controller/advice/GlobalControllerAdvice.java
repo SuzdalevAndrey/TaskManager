@@ -21,8 +21,7 @@ public class GlobalControllerAdvice {
     private final MessageSource messageSource;
 
     @ExceptionHandler({
-            UserAlreadyExsitsException.class,
-            InvalidRefreshTokenException.class
+            UserAlreadyExsitsException.class
     })
     public ProblemDetail handleConflictException(RuntimeException ex, Locale locale) {
         ProblemDetail response = ProblemDetail.forStatusAndDetail(
@@ -52,7 +51,8 @@ public class GlobalControllerAdvice {
     }
 
     @ExceptionHandler({
-            UserUnauthenticatedException.class
+            UserUnauthenticatedException.class,
+            InvalidRefreshTokenException.class
     })
     public ProblemDetail handleUnauthorizedException(RuntimeException ex, Locale locale) {
         ProblemDetail response = ProblemDetail.forStatusAndDetail(

@@ -316,7 +316,7 @@ class AuthControllerIT extends BaseIT{
 
         mockMvc.perform(request)
                 .andExpectAll(
-                        status().isConflict(),
+                        status().isUnauthorized(),
                         content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
                         jsonPath("$").exists()
                 );
