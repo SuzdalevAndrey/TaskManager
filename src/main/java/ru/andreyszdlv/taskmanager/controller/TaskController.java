@@ -30,13 +30,23 @@ public class TaskController {
 
     @Operation(
             summary = "Получение всех задач",
-            description = "Этот эндпоинт позволяет получить все задачи с возможностью фильтрации по статусу, приоритету, автору и исполнителю.",
+            description = "Этот эндпоинт позволяет получить все задачи с возможностью фильтрации по статусу, приоритету, автору и исполнителю. Требуется роль ADMIN.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Задачи успешно получены",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
-                    @ApiResponse(responseCode = "400", description = "Ошибка валидации фильтров",
-                            content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "403", description = "Недостаточно прав", content = @Content)
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Задачи успешно получены",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Ошибка валидации фильтров",
+                            content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Недостаточно прав, пользователь с ролью USER.",
+                            content = @Content
+                    )
             }
     )
     @GetMapping
@@ -66,10 +76,16 @@ public class TaskController {
             summary = "Получение задач, назначенных на меня",
             description = "Этот эндпоинт позволяет получить все задачи, где текущий пользователь является исполнителем.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Задачи успешно получены",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
-                    @ApiResponse(responseCode = "400", description = "Ошибка валидации фильтров",
-                            content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Задачи успешно получены",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Ошибка валидации фильтров",
+                            content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))
+                    )
             }
     )
     @GetMapping("/assigned-to-me")
@@ -96,12 +112,21 @@ public class TaskController {
             summary = "Получение задачи по ID",
             description = "Этот эндпоинт позволяет получить задачу по ее уникальному ID.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Задача успешно получена",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskDto.class))),
-                    @ApiResponse(responseCode = "404", description = "Задача с таким ID не найдена",
-                            content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "403", description = "Недостаточно прав",
-                            content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Задача успешно получена",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskDto.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Задача с таким ID не найдена",
+                            content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Недостаточно прав, пользователь с ролью USER пытается получить задачу, у которой он не назначен исполнителем.",
+                            content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))
+                    )
             }
     )
     @GetMapping("/{id}")
@@ -116,13 +141,23 @@ public class TaskController {
 
     @Operation(
             summary = "Создание новой задачи",
-            description = "Этот эндпоинт позволяет создать новую задачу с указанием всех необходимых данных.",
+            description = "Этот эндпоинт позволяет создать новую задачу с указанием всех необходимых данных. Требуется роль ADMIN.",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Задача успешно создана",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskDto.class))),
-                    @ApiResponse(responseCode = "400", description = "Ошибка валидации данных",
-                            content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "403", description = "Недостаточно прав", content = @Content)
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Задача успешно создана",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskDto.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Ошибка валидации данных",
+                            content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Недостаточно прав, пользователь с ролью USER.",
+                            content = @Content
+                    )
             }
     )
     @PostMapping
@@ -142,7 +177,7 @@ public class TaskController {
 
     @Operation(
             summary = "Частичное обновление задачи",
-            description = "Этот эндпоинт позволяет частично обновить данные задачи (например, только название или описание).",
+            description = "Этот эндпоинт позволяет частично обновить данные задачи (например, только название или описание). Требуется роль ADMIN.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Задача успешно обновлена",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskDto.class))),
@@ -150,7 +185,7 @@ public class TaskController {
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "404", description = "Задача с таким ID не найдена",
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "403", description = "Недостаточно прав", content = @Content)
+                    @ApiResponse(responseCode = "403", description = "Недостаточно прав, пользователь с ролью USER.", content = @Content)
             }
     )
     @PatchMapping("/{id}")
@@ -179,7 +214,7 @@ public class TaskController {
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "400", description = "Ошибка валидации данных",
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "403", description = "Недостаточно прав",
+                    @ApiResponse(responseCode = "403", description = "Недостаточно прав, пользователь с ролью USER пытается обновить статус задачи, у которой он не назначен исполнителем",
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
             }
     )
@@ -201,7 +236,7 @@ public class TaskController {
 
     @Operation(
             summary = "Обновление приоритета задачи",
-            description = "Этот эндпоинт позволяет обновить приоритет задачи.",
+            description = "Этот эндпоинт позволяет обновить приоритет задачи. Требуется роль ADMIN.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Приоритет задачи обновлен успешно",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskDto.class))),
@@ -209,7 +244,7 @@ public class TaskController {
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "400", description = "Ошибка валидации данных",
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "403", description = "Недостаточно прав", content = @Content)
+                    @ApiResponse(responseCode = "403", description = "Недостаточно прав, пользователь с ролью USER", content = @Content)
             }
     )
     @PatchMapping("/{id}/priority")
@@ -230,7 +265,7 @@ public class TaskController {
 
     @Operation(
             summary = "Обновление исполнителя задачи",
-            description = "Этот эндпоинт позволяет обновить исполнителя задачи.",
+            description = "Этот эндпоинт позволяет обновить исполнителя задачи. Требуется роль ADMIN.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Исполнитель задачи обновлен успешно",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskDto.class))),
@@ -238,7 +273,7 @@ public class TaskController {
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "400", description = "Ошибка валидации данных",
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "403", description = "Недостаточно прав", content = @Content)
+                    @ApiResponse(responseCode = "403", description = "Недостаточно прав, пользователь с ролью USER", content = @Content)
             }
     )
     @PatchMapping("/{id}/assignee")
@@ -259,12 +294,12 @@ public class TaskController {
 
     @Operation(
             summary = "Удаление задачи",
-            description = "Этот эндпоинт позволяет удалить задачу по ID.",
+            description = "Этот эндпоинт позволяет удалить задачу по ID. Требуется роль ADMIN.",
             responses = {
                     @ApiResponse(responseCode = "204", description = "Задача успешно удалена"),
                     @ApiResponse(responseCode = "404", description = "Задача с таким ID не найдена",
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "403", description = "Недостаточно прав", content = @Content)
+                    @ApiResponse(responseCode = "403", description = "Недостаточно прав, пользователь с ролью USER", content = @Content)
             }
     )
     @DeleteMapping("/{id}")

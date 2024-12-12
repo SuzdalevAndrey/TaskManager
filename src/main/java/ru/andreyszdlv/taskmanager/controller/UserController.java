@@ -28,13 +28,13 @@ public class UserController {
 
     @Operation(
             summary = "Назначение пользователя администратором",
-            description = "Этот эндпоинт позволяет назначить пользователя администратором.",
+            description = "Этот эндпоинт позволяет назначить пользователя администратором. Требуется роль ADMIN",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Роль пользователя успешно изменена на администратор",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
                     @ApiResponse(responseCode = "404", description = "Пользователь с таким ID не найден",
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "403", description = "Недостаточно прав", content = @Content)
+                    @ApiResponse(responseCode = "403", description = "Недостаточно прав, пользователь с ролью USER.", content = @Content)
             }
     )
     @PostMapping("/{id}/make-admin")
@@ -56,11 +56,11 @@ public class UserController {
 
     @Operation(
             summary = "Получение списка всех пользователей",
-            description = "Этот эндпоинт позволяет получить список всех пользователей.",
+            description = "Этот эндпоинт позволяет получить список всех пользователей. Требуется роль ADMIN",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Список пользователей успешно получен",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
-                    @ApiResponse(responseCode = "403", description = "Недостаточно прав", content = @Content)
+                    @ApiResponse(responseCode = "403", description = "Недостаточно прав, пользователь с ролью USER.", content = @Content)
             }
     )
     @GetMapping

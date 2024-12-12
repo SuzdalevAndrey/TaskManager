@@ -38,7 +38,7 @@ public class CommentController {
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "404", description = "Задача не найдена",
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "403", description = "Не достаточно прав для взаимодействия",
+                    @ApiResponse(responseCode = "403", description = "Не достаточно прав для взаимодействия(пользователь с ролью User не назначен исполнителем задачи)",
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
             }
     )
@@ -65,7 +65,7 @@ public class CommentController {
                     @ApiResponse(responseCode = "204", description = "Комментарий успешно удален"),
                     @ApiResponse(responseCode = "404", description = "Комментарий не найден",
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "403", description = "Не достаточно прав для взаимодействия",
+                    @ApiResponse(responseCode = "403", description = "Не достаточно прав для взаимодействия(пользователь с ролью User не создавал данный коммент)",
                             content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
             }
     )
