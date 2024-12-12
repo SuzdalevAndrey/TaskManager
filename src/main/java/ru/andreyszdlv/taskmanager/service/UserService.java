@@ -130,13 +130,18 @@ public class UserService {
     @Transactional
     public void createAdminIfNotExists() {
         log.info("Creating admin if not exists");
-        this.checkUserExists(emailAdmin);
+        try{
+            this.checkUserExists(emailAdmin);
 
-        User admin = new User();
-        admin.setName("admin");
-        admin.setEmail(emailAdmin);
-        admin.setPassword(passwordEncoder.encode(passwordAdmin));
-        admin.setRole(Role.ADMIN);
-        userRepository.save(admin);
+            User admin = new User();
+            admin.setName("admin");
+            admin.setEmail(emailAdmin);
+            admin.setPassword(passwordEncoder.encode(passwordAdmin));
+            admin.setRole(Role.ADMIN);
+            userRepository.save(admin);
+        }
+        catch (UserAlreadyExsitsException ex){
+            log.error("User {} already exists", emailAdmin);
+        }
     }
 }
