@@ -345,7 +345,7 @@ class AuthControllerIT extends BaseIT{
     }
 
     @Test
-    void logout_Returns401_WhenTokenInvalid() throws Exception {
+    void logout_Returns403_WhenTokenInvalid() throws Exception {
         String email = "email@email.ru";
         Role role = Role.USER;
         String validAccessToken = jwtStorageService.generateAccessToken(email, role);
@@ -357,7 +357,7 @@ class AuthControllerIT extends BaseIT{
 
         mockMvc.perform(request)
                 .andExpectAll(
-                        status().isUnauthorized(),
+                        status().isForbidden(),
                         jsonPath("$").exists()
                 );
 
