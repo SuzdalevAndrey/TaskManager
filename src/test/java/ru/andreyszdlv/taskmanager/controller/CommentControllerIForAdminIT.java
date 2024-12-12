@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @Testcontainers
-class CommentControllerIT extends BaseIT {
+class CommentControllerIForAdminIT extends BaseIT {
 
     @Container
     static PostgreSQLContainer<?> postgreSQLContainer =
@@ -87,17 +87,18 @@ class CommentControllerIT extends BaseIT {
         user.setEmail(email);
         user.setRole(role);
         user.setPassword("password");
-        String accessToken = jwtStorageService.generateAccessToken(email, role);
-        String content = "content";
-        CreateCommentRequestDto requestDto = new CreateCommentRequestDto(content);
+        userRepository.save(user);
         Task task = new Task();
         task.setTitle("title");
         task.setDescription("description");
         task.setPriority(TaskPriority.HIGH);
         task.setStatus(TaskStatus.WAITING);
         task.setCreatedAt(LocalDateTime.now());
-        task.setAuthor(userRepository.save(user));
+        task.setAuthor(user);
         long taskId = taskRepository.save(task).getId();
+        String content = "content";
+        CreateCommentRequestDto requestDto = new CreateCommentRequestDto(content);
+        String accessToken = jwtStorageService.generateAccessToken(email, role);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .post(BASE_URL+"/{taskId}/comments", taskId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -119,10 +120,10 @@ class CommentControllerIT extends BaseIT {
     void createComment_Returns400_WhenDataInvalid() throws Exception {
         String email = "admin@admin.com";
         Role role = Role.ADMIN;
-        String accessToken = jwtStorageService.generateAccessToken(email, role);
         String content = "    ";
         CreateCommentRequestDto requestDto = new CreateCommentRequestDto(content);
         long taskId = 1L;
+        String accessToken = jwtStorageService.generateAccessToken(email, role);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .post(BASE_URL+"/{taskId}/comments", taskId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -135,17 +136,17 @@ class CommentControllerIT extends BaseIT {
                 jsonPath("$").exists()
         );
 
-        assertEquals(0, commentRepository.findAll().size());
+        assertEquals(0, commentRepository.count());
     }
 
     @Test
     void createComment_Returns404_WhenDataIsValidAndTaskNotExists() throws Exception {
         String email = "admin@admin.com";
         Role role = Role.ADMIN;
-        String accessToken = jwtStorageService.generateAccessToken(email, role);
         String content = "content";
         CreateCommentRequestDto requestDto = new CreateCommentRequestDto(content);
         long taskId = 1L;
+        String accessToken = jwtStorageService.generateAccessToken(email, role);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .post(BASE_URL+"/{taskId}/comments", taskId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -158,7 +159,7 @@ class CommentControllerIT extends BaseIT {
                 jsonPath("$").exists()
         );
 
-        assertEquals(0, commentRepository.findAll().size());
+        assertEquals(0, commentRepository.count());
     }
 
     @Test
@@ -166,8 +167,6 @@ class CommentControllerIT extends BaseIT {
     void deleteComment_Returns204_WhenCommentExists() throws Exception {
         String email = "admin@admin.com";
         Role role = Role.ADMIN;
-        String accessToken = jwtStorageService.generateAccessToken(email, role);
-        String content = "content";
         User user = new User();
         user.setName("name");
         user.setEmail(email);
@@ -181,12 +180,14 @@ class CommentControllerIT extends BaseIT {
         task.setStatus(TaskStatus.WAITING);
         task.setCreatedAt(LocalDateTime.now());
         task.setAuthor(savedUser);
+        String content = "content";
         Comment comment = new Comment();
         comment.setContent(content);
         comment.setCreatedAt(LocalDateTime.now());
         comment.setAuthor(savedUser);
         comment.setTask(taskRepository.save(task));
         long commentId = commentRepository.save(comment).getId();
+        String accessToken = jwtStorageService.generateAccessToken(email, role);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .delete(BASE_URL+"/comments/{commentId}", commentId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -196,15 +197,15 @@ class CommentControllerIT extends BaseIT {
                 status().isNoContent()
         );
 
-        assertEquals(0, commentRepository.findAll().size());
+        assertEquals(0, commentRepository.count());
     }
 
     @Test
     void deleteComment_Returns404_WhenCommentNotExists() throws Exception {
         String email = "admin@admin.com";
         Role role = Role.ADMIN;
-        String accessToken = jwtStorageService.generateAccessToken(email, role);
         long commentId = 1L;
+        String accessToken = jwtStorageService.generateAccessToken(email, role);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .delete(BASE_URL + "/comments/{commentId}", commentId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -216,6 +217,6 @@ class CommentControllerIT extends BaseIT {
                 jsonPath("$").exists()
         );
 
-        assertEquals(0, commentRepository.findAll().size());
+        assertEquals(0, commentRepository.count());
     }
 }

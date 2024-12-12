@@ -9,6 +9,8 @@ import ru.andreyszdlv.taskmanager.model.Task;
 import ru.andreyszdlv.taskmanager.service.UserService;
 import ru.andreyszdlv.taskmanager.validation.AccessControlValidator;
 
+import java.util.Objects;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -25,6 +27,7 @@ public class AccessControlValidatorImpl implements AccessControlValidator {
         );
         return userService.getCurrentUserRole() == Role.ADMIN
                 || (userService.getCurrentUserRole() == Role.USER
+                && !Objects.isNull(task.getAssignee())
                 && task.getAssignee().getEmail().equals(email));
     }
 

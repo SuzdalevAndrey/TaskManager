@@ -36,7 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @Testcontainers
-class TaskControllerIT extends BaseIT {
+class TaskControllerIForAdminIT extends BaseIT {
+
     @Container
     static PostgreSQLContainer<?> postgreSQLContainer =
             new PostgreSQLContainer<>("postgres:latest");
@@ -255,7 +256,7 @@ class TaskControllerIT extends BaseIT {
                 jsonPath("$").exists()
         );
 
-        assertEquals(0, taskRepository.findAll().size());
+        assertEquals(0, taskRepository.count());
     }
 
     @Test
