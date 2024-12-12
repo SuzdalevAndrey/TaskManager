@@ -5,12 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.andreyszdlv.taskmanager.dto.user.UserDto;
 import ru.andreyszdlv.taskmanager.service.UserService;
 
+import java.util.List;
 import java.util.Locale;
 
 @RestController
@@ -38,5 +37,15 @@ public class UserController {
                         locale
                 )
         );
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserDto>> getAllUsers(){
+        log.info("Received request get all users");
+
+        List<UserDto> users = userService.getAllUsers();
+
+        log.info("Returning {} users", users.size());
+        return ResponseEntity.ok(users);
     }
 }

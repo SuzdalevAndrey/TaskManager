@@ -7,12 +7,16 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.andreyszdlv.taskmanager.dto.user.UserDto;
 import ru.andreyszdlv.taskmanager.enums.Role;
 import ru.andreyszdlv.taskmanager.exception.UserAlreadyExsitsException;
 import ru.andreyszdlv.taskmanager.exception.UserNotFoundException;
 import ru.andreyszdlv.taskmanager.exception.UserUnauthenticatedException;
+import ru.andreyszdlv.taskmanager.mapper.UserMapper;
 import ru.andreyszdlv.taskmanager.model.User;
 import ru.andreyszdlv.taskmanager.repository.UserRepository;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +24,8 @@ import ru.andreyszdlv.taskmanager.repository.UserRepository;
 public class UserService {
 
     private final UserRepository userRepository;
+
+    private final UserMapper userMapper;
 
     @Transactional(readOnly = true)
     public void checkUserExists(String email){
@@ -67,6 +73,13 @@ public class UserService {
         User user = getUserByIdOrElseThrow(id);
 
         user.setRole(Role.ADMIN);
+    }
+
+    @Transactional
+    public List<UserDto> getAllUsers() {
+        log.info("Getting all users");
+
+        return userRepository.findAll().stream().map(userMapper::toUserDto).toList();
     }
 
     public String getCurrentUserEmail(){
