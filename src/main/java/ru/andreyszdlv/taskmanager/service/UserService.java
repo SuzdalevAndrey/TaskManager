@@ -62,9 +62,10 @@ public class UserService {
 
     @Transactional
     public void changeRoleToAdmin(long id) {
+        log.info("Changing role to admin {}", id);
+
         User user = getUserByIdOrElseThrow(id);
 
-        log.info("Changing role to admin {}", id);
         user.setRole(Role.ADMIN);
     }
 

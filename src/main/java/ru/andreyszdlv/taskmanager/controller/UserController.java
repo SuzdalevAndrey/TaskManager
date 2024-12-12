@@ -25,9 +25,11 @@ public class UserController {
 
     @PostMapping("/{id}/make-admin")
     public ResponseEntity<String> makeAdmin(@PathVariable("id") long id, Locale locale) {
+        log.info("Received request make admin for user id: {}", id);
 
         userService.changeRoleToAdmin(id);
 
+        log.info("User with id: {} now admin", id);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(
