@@ -60,6 +60,14 @@ public class UserService {
         return user;
     }
 
+    @Transactional
+    public void changeRoleToAdmin(long id) {
+        User user = getUserByIdOrElseThrow(id);
+
+        log.info("Changing role to admin {}", id);
+        user.setRole(Role.ADMIN);
+    }
+
     public String getCurrentUserEmail(){
         log.info("Get current user email");
 
