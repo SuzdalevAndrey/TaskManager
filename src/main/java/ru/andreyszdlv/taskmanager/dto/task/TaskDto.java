@@ -20,6 +20,8 @@ public record TaskDto(
 
         LocalDateTime createdAt,
 
+        long authorId,
+
         Long assigneeId,
 
         List<CommentDto> comments

@@ -12,6 +12,7 @@ public interface TaskMapper {
     Task toTask(CreateTaskRequestDto createTaskRequestDto);
 
     @Mapping(target = "assigneeId", source = "assignee.id")
+    @Mapping(target = "authorId", source = "author.id")
     @Mapping(target = "comments", source = "comments")
     TaskDto toTaskDto(Task task);
 }
