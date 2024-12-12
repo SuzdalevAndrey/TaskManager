@@ -34,9 +34,9 @@ public class UserController {
                 .status(HttpStatus.CREATED)
                 .body(
                         messageSource.getMessage(
-                                "admin.change-role",
-                                null,
-                                "admin.change-role",
+                                "user.role.change_to_admin",
+                                new Object[]{id},
+                                "user.role.change_to_admin",
                                 locale
                         )
                 );
