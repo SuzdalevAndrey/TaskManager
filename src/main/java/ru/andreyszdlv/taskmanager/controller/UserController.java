@@ -16,7 +16,7 @@ import java.util.Locale;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
@@ -24,21 +24,19 @@ public class UserController {
     private final MessageSource messageSource;
 
     @PostMapping("/{id}/make-admin")
-    public ResponseEntity<String> makeAdmin(@PathVariable("id") long id, Locale locale) {
+    public ResponseEntity<String> makeAdmin(@PathVariable long id, Locale locale) {
         log.info("Received request make admin for user id: {}", id);
 
         userService.changeRoleToAdmin(id);
 
         log.info("User with id: {} now admin", id);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(
-                        messageSource.getMessage(
-                                "user.role.change_to_admin",
-                                new Object[]{id},
-                                "user.role.change_to_admin",
-                                locale
-                        )
-                );
+        return ResponseEntity.ok(
+                messageSource.getMessage(
+                        "user.role.change_to_admin",
+                        new Object[]{id},
+                        "user.role.change_to_admin",
+                        locale
+                )
+        );
     }
 }
