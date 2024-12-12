@@ -59,7 +59,7 @@
 
 1. **Склонируйте репозиторий**:
    ```bash
-   git clone https://github.com/SuzdalevAndrey/TaskManager
+   git clone https://github.com/SuzdalevAndrey/TaskManager.git
    ```
 2. **Перейдите в терминале в папку с файлом docker-compose.yaml**
 
