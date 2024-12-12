@@ -24,11 +24,11 @@ public class Task {
     @Column(name = "c_description", length = 1000)
     private String description;
 
-    @Column(name = "c_status", nullable = false, columnDefinition = "VARCHAR(20) CHECK (c_status IN ('WAITING', 'IN_PROGRESS', 'COMPLETED'))")
+    @Column(name = "c_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
-    @Column(name = "c_priority", nullable = false, columnDefinition = "VARCHAR(20) CHECK (c_priority IN ('LOW', 'MEDIUM', 'HIGH'))")
+    @Column(name = "c_priority", nullable = false)
     @Enumerated(EnumType.STRING)
     private TaskPriority priority;
 
