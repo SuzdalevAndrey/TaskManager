@@ -67,8 +67,15 @@
    ```bash
    docker-compose up --build
    ```
+4. **Создание администратора:** При первом запуске приложения автоматически создаётся пользователь с ролью ADMIN:
 
-4. **Swagger UI**:
+   ```env
+   ADMIN_EMAIL=admin@admin.ru
+   ADMIN_PASSWORD=000000
+   ```
+   Логин и пароль можно настроить через переменные окружения.
+
+5. **Swagger UI**:
    После запуска сервиса, Swagger UI будет доступен по адресу:  
    [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
    
